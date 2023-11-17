@@ -9,7 +9,6 @@ export default function Page() {
       <div className="page-title">
         <div className="row">
           <h4>Chat Web App</h4>
-          <h2>chat</h2>
           <img
             src="https://www.bootdey.com/img/Content/avatar/avatar5.png"
             alt="Retail Admin"
@@ -20,14 +19,10 @@ export default function Page() {
         <div className="layout-main">
           <div className="layout-left">
             <div className="users-container">
-              <div className="chat-search-box">
-                <div className="form-group">
-                  <div className="input-group">
-                    <button type="button" className="btn ">
-                      <i className="fa fa-search"></i>
-                    </button>
-                    <input className="form-control" placeholder="Search" />
-                  </div>
+              <div className="box">
+                <div className="container-1">
+                    <span className="icon"><i className="fa fa-search"></i></span>
+                    <input type="search" id="search" placeholder="Search..." />
                 </div>
               </div>
               <ul className="users">
@@ -127,7 +122,7 @@ export default function Page() {
                     <p className="content">Hi, Russell</p>
                   </div>
                 </li>
-                <li className="person active-user" data-chat="person1">
+                <li className="person" data-chat="person1">
                   <div className="user">
                     <img
                       src="https://www.bootdey.com/img/Content/avatar/avatar3.png"
@@ -233,7 +228,7 @@ export default function Page() {
                     <p>I'm very excited to show this to our team.</p>
                   </div>
                   <div className="chat-hour">
-                    08:55 <span className="fa fa-check-circle"></span>
+                    08:55<span className="fa fa-check-circle"></span>
                   </div>
                 </li>
                 <li className="chat-right">
@@ -352,7 +347,7 @@ export default function Page() {
               </button>
             </div>
           </div>
-          <div className="layout-right">
+          {/* <div className="layout-right">
             <div className='group-call1'>
               <img
                   src="https://www.bootdey.com/img/Content/avatar/avatar3.png"
@@ -393,7 +388,7 @@ export default function Page() {
                 </button>
               </div>              
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

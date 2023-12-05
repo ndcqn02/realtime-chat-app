@@ -1,18 +1,18 @@
-import '@clerk/nextjs';
-import '@/styles/Home.css';
-import 'next/app';
+import '@clerk/nextjs'
+import '@/styles/Home.css'
+import 'next/app'
 
 export default function Page() {
   return (
-    <div >
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <div className="layout">
+      <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+      />
       <div className="page-title">
         <div className="row">
           <h4>Chat Web App</h4>
-          <img
-            src="https://www.bootdey.com/img/Content/avatar/avatar5.png"
-            alt="Retail Admin"
-          />
+          <img src="https://www.bootdey.com/img/Content/avatar/avatar5.png" alt="Retail Admin" />
         </div>
       </div>
       <div className="card m-0">
@@ -21,8 +21,51 @@ export default function Page() {
             <div className="users-container">
               <div className="box">
                 <div className="container-1">
-                    <span className="icon"><i className="fa fa-search"></i></span>
-                    <input type="search" id="search" placeholder="Search..." />
+                  <p>
+                    <strong>Active users</strong>
+                  </p>
+
+                  <img
+                    src="https://www.bootdey.com/img/Content/avatar/avatar1.png"
+                    alt="Retail Admin"
+                    className="avt-new"
+                  />
+
+                  <img
+                    src="https://www.bootdey.com/img/Content/avatar/avatar2.png"
+                    alt="Retail Admin"
+                    className="avt-new"
+                  />
+
+                  <img
+                    src="https://www.bootdey.com/img/Content/avatar/avatar3.png"
+                    alt="Retail Admin"
+                    className="avt-new"
+                  />
+                  <img
+                    src="https://www.bootdey.com/img/Content/avatar/avatar4.png"
+                    alt="Retail Admin"
+                    className="avt-new"
+                  />
+
+                  <img
+                    src="https://www.bootdey.com/img/Content/avatar/avatar5.png"
+                    alt="Retail Admin"
+                    className="avt-new"
+                  />
+                </div>
+              </div>
+              <div className="box">
+                <div className="container-1">
+                  <span className="icon">
+                    <i className="fa fa-search" style={{ color: '#b4b5b6' }}></i>
+                  </span>
+                  <input type="search" id="search" placeholder="Search or star new chat" />
+                </div>
+              </div>
+              <div className="box">
+                <div className="container-1">
+                  <h5>ALL CHATS</h5>
                 </div>
               </div>
               <ul className="users">
@@ -191,14 +234,14 @@ export default function Page() {
           </div>
           <div className="layout-center">
             <div className="selected-user">
-              <div className='name-chat'>
+              <div className="name-chat">
                 <img
                   src="https://www.bootdey.com/img/Content/avatar/avatar3.png"
                   alt="Retail Admin"
                 />
                 <div>
                   <span className="name">Emily Russell</span>
-                  <p className="name">online</p>
+                  <p className="content">online</p>
                 </div>
               </div>
               <div>
@@ -221,9 +264,9 @@ export default function Page() {
                       src="https://www.bootdey.com/img/Content/avatar/avatar3.png"
                       alt="Retail Admin"
                     />
-                    <div className="chat-name">Russell</div>
+                    {/* <div className="chat-name">Russell</div> */}
                   </div>
-                  <div className="chat-text">
+                  <div className="chat-text-left">
                     Hello, I'm Russell.
                     <p>I'm very excited to show this to our team.</p>
                   </div>
@@ -235,17 +278,17 @@ export default function Page() {
                   <div className="chat-hour">
                     08:56 <span className="fa fa-check-circle"></span>
                   </div>
-                  <div className="chat-text">
+                  <div className="chat-text-right">
                     Hi, Russell
                     <p>I'm very excited to show this to our team.</p>
                   </div>
-                  <div className="chat-avatar">
+                  {/* <div className="chat-avatar">
                     <img
                       src="https://www.bootdey.com/img/Content/avatar/avatar5.png"
                       alt="Retail Admin"
                     />
                     <div className="chat-name">Sam</div>
-                  </div>
+                  </div> */}
                 </li>
                 <li className="chat-left">
                   <div className="chat-avatar">
@@ -253,9 +296,9 @@ export default function Page() {
                       src="https://www.bootdey.com/img/Content/avatar/avatar3.png"
                       alt="Retail Admin"
                     />
-                    <div className="chat-name">Russell</div>
+                    {/* <div className="chat-name">Russell</div> */}
                   </div>
-                  <div className="chat-text">
+                  <div className="chat-text-left">
                     Are we meeting today?
                     <p>I'm very excited to show this to our team.</p>
                   </div>
@@ -267,17 +310,17 @@ export default function Page() {
                   <div className="chat-hour">
                     08:59 <span className="fa fa-check-circle"></span>
                   </div>
-                  <div className="chat-text">
+                  <div className="chat-text-right">
                     Well I am not sure.
                     <p>I'm very excited to show this to our team.</p>
                   </div>
-                  <div className="chat-avatar">
+                  {/* <div className="chat-avatar">
                     <img
                       src="https://www.bootdey.com/img/Content/avatar/avatar5.png"
                       alt="Retail Admin"
                     />
                     <div className="chat-name">Joyse</div>
-                  </div>
+                  </div> */}
                 </li>
                 <li className="chat-left">
                   <div className="chat-avatar">
@@ -285,9 +328,9 @@ export default function Page() {
                       src="https://www.bootdey.com/img/Content/avatar/avatar3.png"
                       alt="Retail Admin"
                     />
-                    <div className="chat-name">Russell</div>
+                    {/* <div className="chat-name">Russell</div> */}
                   </div>
-                  <div className="chat-text">
+                  <div className="chat-text-left">
                     The rest of the team is not here yet.
                     <p>I'm very excited to show this to our team.</p>
                   </div>
@@ -299,16 +342,16 @@ export default function Page() {
                   <div className="chat-hour">
                     08:59 <span className="fa fa-check-circle"></span>
                   </div>
-                  <div className="chat-text">
+                  <div className="chat-text-right">
                     Have you faced any problems at the last phase of the project?
                   </div>
-                  <div className="chat-avatar">
+                  {/* <div className="chat-avatar">
                     <img
                       src="https://www.bootdey.com/img/Content/avatar/avatar5.png"
                       alt="Retail Admin"
                     />
                     <div className="chat-name">Jin</div>
-                  </div>
+                  </div> */}
                 </li>
                 <li className="chat-left">
                   <div className="chat-avatar">
@@ -316,9 +359,9 @@ export default function Page() {
                       src="https://www.bootdey.com/img/Content/avatar/avatar3.png"
                       alt="Retail Admin"
                     />
-                    <div className="chat-name">Russell</div>
+                    {/* <div className="chat-name">Russell</div> */}
                   </div>
-                  <div className="chat-text">
+                  <div className="chat-text-left">
                     Actually everything was fine.
                     <p>I'm very excited to show this to our team.</p>
                   </div>
@@ -334,7 +377,7 @@ export default function Page() {
                   <i className="far fa-smile" style={{ color: '#b8b8b8' }}></i>
                 </button>
                 <textarea
-                  className="form-control"
+                  className="form-control "
                   rows={2}
                   placeholder="Type your message here..."
                 ></textarea>

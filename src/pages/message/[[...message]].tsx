@@ -5,30 +5,32 @@ import 'next/app'
 export default function Page() {
   return (
     <div className="layout">
-      <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-      />
-      <div className="page-title">
-        <div className="row">
-          <h4>Chat Web App</h4>
-          <img src="https://www.bootdey.com/img/Content/avatar/avatar5.png" alt="Retail Admin" />
+      <div className='fixed-top'>
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+        />
+        <div className="page-title">
+          <div className="row">
+            <h4>Chat Web App</h4>
+            <img src="https://www.bootdey.com/img/Content/avatar/avatar5.png" alt="Retail Admin" />
+          </div>
         </div>
-      </div>
-      <div className="top-bar">
-        <div className="navbar">
-          <a href="#">
-            <i className="fas fa-home"></i>
-          </a>
-          <a href="#">
-            <i className="far fa-comment-dots"></i>
-          </a>
-          <a href="#">
-            <i className="fas fa-users"></i>
-          </a>
-          <a href="#">
-            <i className="far fa-bell"></i>
-          </a>
+        <div className="top-bar">
+          <div className="navbar">
+            <a href="#">
+              <i className="fas fa-home"></i>
+            </a>
+            <a href="#">
+              <i className="far fa-comment-dots"></i>
+            </a>
+            <a href="#">
+              <i className="fas fa-users"></i>
+            </a>
+            <a href="#">
+              <i className="far fa-bell"></i>
+            </a>
+          </div>
         </div>
       </div>
       <div className="card m-0">

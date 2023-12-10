@@ -1390,7 +1390,7 @@ form button {
 
 .post-meta > img {
     float: left;
-    width: 95%;
+    width: 93%;
     align-items: center;
     border-radius: 0;
 }
@@ -1398,7 +1398,7 @@ form button {
 .description {
     float: left;
     margin-top: 12px;
-    width: 95%;
+    width: 93%;
 }
 
 .description > p {
@@ -1436,7 +1436,7 @@ form button {
     content: '';
     display: block;
     position: absolute;
-    width: 100%;
+    width: 95%;
     height: 1px;
     background-color: #d8d8d8; /* Màu của đường kẻ */
   }
@@ -10136,3 +10136,33 @@ aside.sidebar.full-style {
     scrollbar-color: dark gray lightgray; 
   }
 
+  .nav-bar {
+    margin-left:30px;
+    margin-top:20px;
+}
+
+.nav {
+    list-style-type: none; 
+    padding: 0; 
+    margin: 0; 
+}
+
+.nav li {
+   
+    margin-bottom: 30px; /* Khoảng cách giữa các mục danh sách */
+}
+
+.nav i {
+    margin-right: 20px; /* Khoảng cách giữa biểu tượng và văn bản */
+}
+
+.nav a {
+    text-decoration: none; /* Loại bỏ gạch chân dưới cho liên kết */
+    color: #333; /* Màu văn bản cho liên kết */
+    /* Thêm các thuộc tính CSS bạn muốn cho thẻ a */
+}
+
+/* Hover effect cho liên kết */
+.nav a:hover {
+    color: #00fe2a; /* Màu văn bản khi di chuột qua liên kết */
+}

@@ -275,9 +275,11 @@ img {
 
 .navbar a:hover {
   color: #00fe2a;
-  border-bottom: 5px solid #00fe2a;
+  border-bottom: 2px solid #00fe2a;
 }
-
+.navbar a.active {
+  color: #00fe2a; /* Change the color to your desired active color */
+}
 .navbar i {
   
   font-size:20px;

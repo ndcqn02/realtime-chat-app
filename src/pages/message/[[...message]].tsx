@@ -18,10 +18,10 @@ export default function Page() {
         </div>
         <div className="top-bar">
           <div className="navbar">
-            <a href="#">
+            <a href="home">
               <i className="fas fa-home"></i>
             </a>
-            <a href="#">
+            <a href="message">
               <i className="far fa-comment-dots"></i>
             </a>
             <a href="#">

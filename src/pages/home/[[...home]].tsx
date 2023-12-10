@@ -6,7 +6,7 @@ import 'next/app'
 export default function Page() {
   return (
     <div className="layout">
-      <div className='fixed-top'>
+      <div className="fixed-top">
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
@@ -19,10 +19,10 @@ export default function Page() {
         </div>
         <div className="top-bar">
           <div className="navbar">
-            <a href="#">
+            <a href="home">
               <i className="fas fa-home"></i>
             </a>
-            <a href="#">
+            <a href="message">
               <i className="far fa-comment-dots"></i>
             </a>
             <a href="#">
@@ -34,11 +34,57 @@ export default function Page() {
           </div>
         </div>
       </div>
-      <div style={{ height: "16vh" }}></div>
+      <div style={{ height: '16vh' }}></div>
 
       <div className="layout-main-home">
-        <div className='layout-left-home'>
-          
+        <div className="layout-left-home">
+          <div className="nav-bar">
+            <ul className="nav">
+              <li>
+                <i className="fas fa-newspaper"></i>
+                <a href="home" title="">
+                  Trang chủ
+                </a>
+              </li>            
+              <li>
+              <i className="fas fa-users"></i>
+                <a href="" title="">
+                  Nhóm
+                </a>
+              </li>
+              <li>
+                <i className="fas fa-user"></i>
+                <a href="" title="">
+                  Bạn bè
+                </a>
+              </li>
+              <li>
+                <i className="fas fa-image"></i>
+                <a href="" title="">
+                  Hình ảnh
+                </a>
+              </li>
+              <li>
+                <i className="fas fa-video"></i>
+                <a href="" title="">
+                  Video
+                </a>
+              </li>
+              
+               <li>
+               <i className="fas fa-gamepad"></i>
+                <a href="" title="">
+                  Chơi game
+                </a>
+              </li>
+              <li>
+                <i className="fas fa-power-off"></i>
+                <a href="sign-in" title="">
+                  Đăng xuất
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
         <div className="layout-center-home">
           <div className="col-lg-6">
@@ -262,8 +308,8 @@ export default function Page() {
                           />
                         </div>
                         <div className="post-comt-box">
-                          <form method="post" className='comment'>
-                            <textarea className='import' placeholder="Viết bình luận..."></textarea>
+                          <form method="post" className="comment">
+                            <textarea className="import" placeholder="Viết bình luận..."></textarea>
                             <button type="submit">
                               <i className="fas fa-paper-plane" style={{ color: '#9ec94a' }}></i>
                             </button>

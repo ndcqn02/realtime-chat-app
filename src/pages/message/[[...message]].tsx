@@ -2,6 +2,8 @@ import '@clerk/nextjs'
 import '@/styles/Message.css'
 import 'next/app'
 import Image from 'next/image'
+import ChatForm from '@/components/chatForm'
+import { useEffect, useState } from 'react'
 
 const listFriendChat = [
   {
@@ -22,10 +24,9 @@ const listFriendChat = [
     createAt: '15/02/2019',
     message: 'Hi, Russell',
   },
-
 ]
 
-const userId = '12345'
+const userId = 'user_2WnkbS2Yl0i2lKN3pxN3qXajNgM'
 
 const listMessage = [
   {
@@ -41,30 +42,42 @@ const listMessage = [
     senderAvatar: 'https://www.bootdey.com/img/Content/avatar/avatar3.png',
     message: 'Tao ne may',
     createAt: '15/02/2019 08:56',
-  },
-  {
-    senderId: '12345',
-    recipientId: 'user123',
-    senderAvatar: 'https://www.bootdey.com/img/Content/avatar/avatar3.png',
-    message: 'Ahi hi đồ ngốc',
-    createAt: '15/02/2019 08:56',
-  },
-  {
-    senderId: 'user123',
-    recipientId: '12345',
-    senderAvatar: 'https://www.bootdey.com/img/Content/avatar/avatar3.png',
-    message: 'nói chuyện như một professional',
-    createAt: '15/02/2019 08:56',
-  },
-  {
-    senderId: 'user123',
-    recipientId: '12345',
-    senderAvatar: 'https://www.bootdey.com/img/Content/avatar/avatar3.png',
-    message: 'nói chuyện như một professional',
-    createAt: '15/02/2019 08:56',
-  },
+  }
 ]
+
+export interface IChat {
+  _id: string
+  message: string
+  senderId: string
+  recipientId: string
+  createdAt?: string
+  senderAvatar: string
+  __v?: number
+}
+
 export default function Page() {
+  const [chat, setChat] = useState<IChat[]>([])
+
+  useEffect(() => {
+    const fetchChatDetail = async () => {
+      const response = await fetch(
+        'http://localhost:8000/api/messages/chat/user_2WnkbS2Yl0i2lKN3pxN3qXajNgM/user_2Xo1uuwA1hqvwPGVsdOe78nQrDk',
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+      const data = await response.json()
+      console.log('🚀 ~ file: [[...message]].tsx:84 ~ fetchChatDetail ~ result:', data)
+
+      setChat(data.result)
+    }
+
+    fetchChatDetail()
+  }, [])
+
   return (
     <div className="layout">
       <div className="fixed-top">
@@ -220,58 +233,41 @@ export default function Page() {
             {/* chat session */}
             <div className="chat-container">
               <ul className="chat-box chatContainerScroll">
-                {listMessage.map((message) =>
-                  message.senderId === userId ? (
-                    <li key="recipient" className="chat-left">
-                      <div className="chat-avatar">
-                        <Image
+                {Array.isArray(chat) &&
+                  chat.length > 0 &&
+                  chat.map((message) =>
+                    message.senderId === userId ? (
+                      <li key={message.createdAt} className="chat-left">
+                        <div className="chat-avatar">
+                          <Image
                           height={100}
                           width={100}
                           src={message.senderAvatar}
                           alt="Retail Admin"
                         />
-                      </div>
-                      <div className="chat-text-left">
-                        <p> {message.message}</p>
-                      </div>
-                      <div className="chat-hour">
-                        {message.createAt}
-                        <span className="fa fa-check-circle"></span>
-                      </div>
-                    </li>
-                  ) : (
-                    <li key="sender" className="chat-right">
-                      <div className="chat-hour">
-                        {message.createAt} <span className="fa fa-check-circle"></span>
-                      </div>
-                      <div className="chat-text-right">
-                        <p>{message.message}</p>
-                      </div>
-                    </li>
-                  ),
-                )}
+                        </div>
+                        <div className="chat-text-left">
+                          <p> {message.message}</p>
+                        </div>
+                        <div className="chat-hour">
+                          {message.createdAt}
+                          <span className="fa fa-check-circle"></span>
+                        </div>
+                      </li>
+                    ) : (
+                      <li key="sender" className="chat-right">
+                        <div className="chat-hour">
+                          {message.createdAt} <span className="fa fa-check-circle"></span>
+                        </div>
+                        <div className="chat-text-right">
+                          <p>{message.message}</p>
+                        </div>
+                      </li>
+                    ),
+                  )}
               </ul>
             </div>
-            <div className="form-group">
-              <div className="input-group">
-                <button type="button" className="btn ">
-                  <i className="far fa-smile" style={{ color: '#b8b8b8' }}></i>
-                </button>
-                <textarea
-                  className="form-control no-border"
-                  placeholder="Nhập nội dung tin nhắn..."
-                ></textarea>
-                <button type="button" className="btn ">
-                  <i className="fas fa-paperclip" style={{ color: '#b8b8b8' }}></i>
-                </button>
-              </div>
-              <button type="button" className="btn ">
-                <i className="fas fa-microphone" style={{ color: '#b8b8b8' }}></i>
-              </button>
-              <button type="button" className="btn ">
-                <i className="fas fa-paper-plane" style={{ color: '#9ec94a' }}></i>
-              </button>
-            </div>
+            <ChatForm />
           </div>
         </div>
       </div>

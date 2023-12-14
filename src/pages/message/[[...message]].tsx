@@ -7,45 +7,22 @@ const listFriendChat = [
   {
     avatarPath: 'https://www.bootdey.com/img/Content/avatar/avatar3.png',
     name: 'Emily Russell',
-    time: '15/02/2019',
-    content: 'Hi, Russell',
+    createAt: '15/02/2019',
+    message: 'Hi, Russell',
   },
   {
     avatarPath: 'https://www.bootdey.com/img/Content/avatar/avatar3.png',
     name: 'Emily Russell',
-    time: '15/02/2019',
-    content: 'Hi, Russell',
+    createAt: '15/02/2019',
+    message: 'Hi, Russell',
   },
   {
     avatarPath: 'https://www.bootdey.com/img/Content/avatar/avatar3.png',
     name: 'Emily Russell',
-    time: '15/02/2019',
-    content: 'Hi, Russell',
+    createAt: '15/02/2019',
+    message: 'Hi, Russell',
   },
-  {
-    avatarPath: 'https://www.bootdey.com/img/Content/avatar/avatar3.png',
-    name: 'Emily Russell',
-    time: '15/02/2019',
-    content: 'Hi, Russell',
-  },
-  {
-    avatarPath: 'https://www.bootdey.com/img/Content/avatar/avatar3.png',
-    name: 'Emily Russell',
-    time: '15/02/2019',
-    content: 'Hi, Russell',
-  },
-  {
-    avatarPath: 'https://www.bootdey.com/img/Content/avatar/avatar3.png',
-    name: 'Emily Russell',
-    time: '15/02/2019',
-    content: 'Hi, Russell',
-  },
-  {
-    avatarPath: 'https://www.bootdey.com/img/Content/avatar/avatar3.png',
-    name: 'Emily Russell',
-    time: '15/02/2019',
-    content: 'Hi, Russell',
-  },
+
 ]
 
 const userId = '12345'
@@ -54,30 +31,35 @@ const listMessage = [
   {
     senderId: '12345',
     recipientId: 'user123',
+    senderAvatar: 'https://www.bootdey.com/img/Content/avatar/avatar3.png',
     message: 'Chào bạn! Đây là tin nhắn phản hồi từ bot.',
     createAt: '15/02/2019 08:56',
   },
   {
     senderId: 'user123',
     recipientId: 'user123',
+    senderAvatar: 'https://www.bootdey.com/img/Content/avatar/avatar3.png',
     message: 'Tao ne may',
     createAt: '15/02/2019 08:56',
   },
   {
     senderId: '12345',
     recipientId: 'user123',
+    senderAvatar: 'https://www.bootdey.com/img/Content/avatar/avatar3.png',
     message: 'Ahi hi đồ ngốc',
     createAt: '15/02/2019 08:56',
   },
   {
     senderId: 'user123',
     recipientId: '12345',
+    senderAvatar: 'https://www.bootdey.com/img/Content/avatar/avatar3.png',
     message: 'nói chuyện như một professional',
     createAt: '15/02/2019 08:56',
   },
   {
     senderId: 'user123',
     recipientId: '12345',
+    senderAvatar: 'https://www.bootdey.com/img/Content/avatar/avatar3.png',
     message: 'nói chuyện như một professional',
     createAt: '15/02/2019 08:56',
   },
@@ -198,9 +180,9 @@ export default function Page() {
                     <div className="group-name-time">
                       <div className="name-time">
                         <p className="name">{item.name}</p>
-                        <p className="time">{item.time}</p>
+                        <p className="time">{item.createAt}</p>
                       </div>
-                      <p className="content">{item.content}</p>
+                      <p className="content">{item.message}</p>
                     </div>
                   </li>
                 ))}
@@ -243,9 +225,9 @@ export default function Page() {
                     <li key="recipient" className="chat-left">
                       <div className="chat-avatar">
                         <Image
-                          height={200}
-                          width={200}
-                          src="https://www.bootdey.com/img/Content/avatar/avatar3.png"
+                          height={100}
+                          width={100}
+                          src={message.senderAvatar}
                           alt="Retail Admin"
                         />
                       </div>
@@ -260,7 +242,7 @@ export default function Page() {
                   ) : (
                     <li key="sender" className="chat-right">
                       <div className="chat-hour">
-                        08:56 <span className="fa fa-check-circle"></span>
+                        {message.createAt} <span className="fa fa-check-circle"></span>
                       </div>
                       <div className="chat-text-right">
                         <p>{message.message}</p>

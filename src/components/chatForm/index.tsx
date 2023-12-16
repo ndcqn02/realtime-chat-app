@@ -1,7 +1,6 @@
 import React, { useState, KeyboardEvent } from "react";
 import { Socket } from "socket.io-client";
 
-
 interface ISendMessage {
   senderId: string;
   recipientId: string;
@@ -12,6 +11,7 @@ interface ChatFormProps {
   socket: Socket | undefined;
   senderId: string;
   recipientId: string;
+  onSendMessage: () => void;
 }
 
 const ChatForm: React.FC<ChatFormProps> = (props) => {
@@ -21,12 +21,14 @@ const ChatForm: React.FC<ChatFormProps> = (props) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault(); // Ngăn chặn xuống dòng trong textarea
       sendMessage();
+      props.onSendMessage();
     }
   };
 
   const sendMessage = async () => {
     try {
       if (!props.socket) {
+        console.error(`Not found socket: ${props.socket}`);
         return;
       }
 

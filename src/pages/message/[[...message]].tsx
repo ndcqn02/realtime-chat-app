@@ -29,6 +29,7 @@ export default function Page() {
   const [conversation, setConversation] = useState<IChat[]>([]);
   const [listFriend, setListFriend] = useState<IFriendChat[]>([]);
   const [socket, setSocket] = useState<Socket>();
+  const [isReload, setIsReload] = useState<boolean>(false);
 
   const [friendCurrent, setFriendCurrent] = useState<IFriendChat>();
 
@@ -38,7 +39,6 @@ export default function Page() {
   useEffect(() => {
     const fetchListFriendChat = async () => {
       if (userId) {
-        console.log("🚀 ~ file: [[...message]].tsx:40 ~ fetchListFriendChat ~ userId:", userId);
         const response = await fetch(
           `http://localhost:8000/api/messages/getChatListUser/${userId}`,
           {
@@ -49,7 +49,6 @@ export default function Page() {
           },
         );
         const data = await response.json();
-        console.log("🚀 ~ file: [[...message]].tsx:50 ~ fetchListFriendChat ~ data:", data);
         setListFriend(data.result);
 
         if (data.result[0]) {
@@ -57,46 +56,37 @@ export default function Page() {
         }
       }
     };
-
     fetchListFriendChat();
-  });
+  }, [userId, isReload]);
 
   useEffect(() => {
-    const newSocket = hostSocket && io(hostSocket, {});
-    newSocket && setSocket(newSocket);
-
-    newSocket &&
-      newSocket.on("messageResponse", (data: IChat[]) => {
-        setConversation(data);
-      });
-
-    return () => {
-      newSocket && newSocket.disconnect();
-    };
+    const socket = hostSocket && io(hostSocket, {});
+    socket && setSocket(socket);
   }, []);
 
   useEffect(() => {
     const socket = hostSocket && io(hostSocket, {});
     if (socket) {
-      socket.on("replyMessageRes", (data: IReplyMessageRes) => {
-        setConversation(data.chatDetail);
-        setListFriend(data.conversations);
+      socket.on("replyMessageRes", (data: IChat[]) => {
+        console.log("🚀 ~ file: [[...message]].tsx:67 ~ socket.on ~ data:", data);
+        setConversation(data);
       });
+      return () => {
+        socket.disconnect();
+      };
     } else {
       console.error("Could not socket connect");
     }
-    return () => {
-      socket && socket.disconnect();
-    };
   }, [friendCurrent]);
 
   useEffect(() => {
+    const socket = hostSocket && io(hostSocket, {});
     if (friendCurrent && socket) {
       getMessage(socket, friendCurrent?.otherUserId, friendCurrent?.currentUserId);
     } else {
       console.error(`Has not friendCurrent: ${friendCurrent} or socket: ${socket}`);
     }
-  }, [friendCurrent, socket]);
+  }, [friendCurrent]);
 
   const getMessage = async (socket: Socket, senderId: string, recipientId: string) => {
     try {
@@ -132,26 +122,7 @@ export default function Page() {
   //   scrollToBottom()
   // }, [conversation])
 
-  // useEffect(() => {
-  //   const fetchChatDetail = async () => {
-  //     if (userId && friendCurrent?.otherUserId) {
-  //       const response = await fetch(
-  //         `http://localhost:8000/api/messages/chat/${userId}/${friendCurrent.otherUserId}`,
-  //         {
-  //           method: 'GET',
-  //           headers: {
-  //             'Content-Type': 'application/json',
-  //           },
-  //         },
-  //       )
-  //       const data = await response.json()
 
-  //       setConversation(data.result)
-  //     }
-  //   }
-
-  //   fetchChatDetail()
-  // }, [userId, friendCurrent?.otherUserId])
 
   if (!isLoaded || !userId) {
     return null;
@@ -347,6 +318,9 @@ export default function Page() {
               socket={socket}
               senderId={userId}
               recipientId={friendCurrent?.otherUserId || ""}
+              onSendMessage={() => {
+                setIsReload(!isReload);
+              }}
             />
           </div>
         </div>

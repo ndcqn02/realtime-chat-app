@@ -32,9 +32,12 @@ export default function Page() {
   const [isReload, setIsReload] = useState<boolean>(false);
 
   const [friendCurrent, setFriendCurrent] = useState<IFriendChat>();
-
-  const containerRef = useRef<HTMLDivElement>(null);
   const { isLoaded, userId } = useAuth();
+
+  useEffect(() => {
+    const socket = hostSocket && io(hostSocket, {});
+    socket && setSocket(socket);
+  }, []);
 
   useEffect(() => {
     const fetchListFriendChat = async () => {
@@ -59,10 +62,7 @@ export default function Page() {
     fetchListFriendChat();
   }, [userId, isReload]);
 
-  useEffect(() => {
-    const socket = hostSocket && io(hostSocket, {});
-    socket && setSocket(socket);
-  }, []);
+
 
   useEffect(() => {
     const socket = hostSocket && io(hostSocket, {});
@@ -104,25 +104,7 @@ export default function Page() {
     console.log("Conversation updated:", conversation);
   }, [conversation]);
 
-  const scrollToBottom = () => {
-    console.log("containerRef", containerRef);
-
-    if (containerRef.current) {
-      // containerRef.current.scrollTop = containerRef.current.scrollHeight
-      containerRef.current.scrollTo({
-        left: 0,
-        top: containerRef.current.scrollHeight,
-        behavior: "smooth",
-      });
-      console.log("containerRef.current.scrollHeight", containerRef.current.scrollHeight);
-    }
-  };
-
-  // useEffect(() => {
-  //   scrollToBottom()
-  // }, [conversation])
-
-
+  
 
   if (!isLoaded || !userId) {
     return null;
@@ -315,7 +297,6 @@ export default function Page() {
               name={friendCurrent?.name || ""}
             />
             <ChatForm
-              socket={socket}
               senderId={userId}
               recipientId={friendCurrent?.otherUserId || ""}
               onSendMessage={() => {

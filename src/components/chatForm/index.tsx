@@ -1,6 +1,6 @@
+import { hostSocket } from "@/constant";
 import React, { useState, KeyboardEvent } from "react";
-import { Socket } from "socket.io-client";
-
+import io, { Socket } from "socket.io-client";
 interface ISendMessage {
   senderId: string;
   recipientId: string;
@@ -8,7 +8,7 @@ interface ISendMessage {
 }
 
 interface ChatFormProps {
-  socket: Socket | undefined;
+  socket?: Socket | undefined;
   senderId: string;
   recipientId: string;
   onSendMessage: () => void;
@@ -26,22 +26,19 @@ const ChatForm: React.FC<ChatFormProps> = (props) => {
   };
 
   const sendMessage = async () => {
-    try {
-      if (!props.socket) {
-        console.error(`Not found socket: ${props.socket}`);
-        return;
-      }
+    const socket = hostSocket && io(hostSocket, {});
 
+    if (socket) {
       const messageData: ISendMessage = {
         senderId: props.senderId,
         recipientId: props.recipientId,
         message: message,
       };
-      props.socket.emit("sendMessage", messageData);
+      socket.emit("sendMessage", messageData);
 
       setMessage("");
-    } catch (error) {
-      console.error("Lỗi kết nối:", error);
+    } else {
+      console.error("Not have socket");
     }
   };
 

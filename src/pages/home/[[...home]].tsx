@@ -14,7 +14,7 @@ export default function Page() {
   const [imageUrl, setImageUrl] = useState(
     "https://cdn.sforum.vn/sforum/wp-content/uploads/2023/06/tai-hinh-nen-dep-nhat-the-gioi-57.jpg",
   );
-
+  setEditModalOpen
   const handleEditClick = () => {
     setEditModalOpen(true);
   };
@@ -41,7 +41,7 @@ export default function Page() {
   const openDeleteModal = () => {
     setDeleteModalOpen(true);
   };
-  
+
   const closeDeleteModal = () => {
     setDeleteModalOpen(false);
   };
@@ -222,12 +222,12 @@ export default function Page() {
                         className='dropdown-content'
                         id='myDropdown'
                       >
-                        <ul>
+                        <ul className="ul">
                           <li>
-                            <a onClick={handleEditClick}>Chỉnh sửa bài viết</a>
+                            <a onClick={handleEditClick} ><i className="fas fa-pencil-alt">  Chỉnh sửa</i></a>
                           </li>
                           <li>
-                            <a onClick={openDeleteModal}>Xóa bài viết</a>
+                            <a onClick={openDeleteModal} ><i className="fas fa-trash-alt">  Xóa</i></a>
                           </li>
                         </ul>
                       </div>
@@ -242,7 +242,7 @@ export default function Page() {
                           placeholder='Nhập mô tả bài viết...'
                         ></textarea>
                         <div className='post-meta'>
-                          <img
+                          <img className="m-r-20"
                             src={imageUrl}
                             alt='Bài viết'
                           />

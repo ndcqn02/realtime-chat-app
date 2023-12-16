@@ -128,30 +128,30 @@ export default function Page() {
     }
   };
 
-  // useEffect(() => {
-  //   scrollToBottom()
-  // }, [conversation])
+  useEffect(() => {
+    scrollToBottom()
+  }, [conversation])
 
-  // useEffect(() => {
-  //   const fetchChatDetail = async () => {
-  //     if (userId && friendCurrent?.otherUserId) {
-  //       const response = await fetch(
-  //         `http://localhost:8000/api/messages/chat/${userId}/${friendCurrent.otherUserId}`,
-  //         {
-  //           method: 'GET',
-  //           headers: {
-  //             'Content-Type': 'application/json',
-  //           },
-  //         },
-  //       )
-  //       const data = await response.json()
+  useEffect(() => {
+    const fetchChatDetail = async () => {
+      if (userId && friendCurrent?.otherUserId) {
+        const response = await fetch(
+          `http://localhost:8000/api/messages/chat/${userId}/${friendCurrent.otherUserId}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        )
+        const data = await response.json()
 
-  //       setConversation(data.result)
-  //     }
-  //   }
+        setConversation(data.result)
+      }
+    }
 
-  //   fetchChatDetail()
-  // }, [userId, friendCurrent?.otherUserId])
+    fetchChatDetail()
+  }, [userId, friendCurrent?.otherUserId])
 
   if (!isLoaded || !userId) {
     return null;

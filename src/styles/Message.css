@@ -86,12 +86,12 @@ p {
 
 .users .person:hover {
   background-color: #c2c6c9;
-  background-image: linear-gradient(right, #e9eff5, #ffffff);
+  background-image: linear-gradient(to left, #e9eff5, #ffffff);
 }
 
 .users .person.active-user {
   background-color: #f0f4f7;
-  background-image: linear-gradient(right, #f7f9fb, #ffffff);
+  background-image: linear-gradient(to left, #f7f9fb, #ffffff);
 }
 
 .users .person:last-child {

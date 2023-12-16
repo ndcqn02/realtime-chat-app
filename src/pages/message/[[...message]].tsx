@@ -4,7 +4,7 @@ import "next/app";
 import Image from "next/image";
 import ChatForm from "@/components/chatForm";
 import { useEffect, useRef, useState } from "react";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 import io, { Socket } from "socket.io-client";
 import { IChat, hostSocket } from "@/constant";
 import { Conversation } from "@/components/conversation";
@@ -19,15 +19,15 @@ export interface IFriendChat {
   name: string;
 }
 
-interface IResponse {
-  message: "";
-  result: any[];
+interface IReplyMessageRes {
+  chatDetail: IChat[];
+  conversations: IFriendChat[];
 }
 
 export default function Page() {
   const [conversation, setConversation] = useState<IChat[]>([]);
   const [listFriend, setListFriend] = useState<IFriendChat[]>([]);
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const [socket, setSocket] = useState<Socket>();
 
   const [friendCurrent, setFriendCurrent] = useState<IFriendChat>();
 
@@ -35,25 +35,70 @@ export default function Page() {
   const { isLoaded, userId } = useAuth();
 
   useEffect(() => {
+    const fetchListFriendChat = async () => {
+      if (userId) {
+        console.log("🚀 ~ file: [[...message]].tsx:40 ~ fetchListFriendChat ~ userId:", userId)
+        const response = await fetch(
+          `http://localhost:8000/api/messages/getChatListUser/${userId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          },
+        );
+        const data = await response.json();
+        console.log("🚀 ~ file: [[...message]].tsx:50 ~ fetchListFriendChat ~ data:", data);
+        setListFriend(data.result);
+
+        if (data.result[0]) {
+          setFriendCurrent(data.result[0]);
+        }
+      }
+    };
+
+    fetchListFriendChat();
+  });
+
+  useEffect(() => {
     const newSocket = hostSocket && io(hostSocket, {});
     newSocket && setSocket(newSocket);
-    newSocket &&
-      newSocket.on("messageResponse", (data: IChat[]) => {
-        setConversation(data);
-      });
-
-    return () => {
-      newSocket && newSocket.disconnect();
-    };
   }, []);
 
-  // const sendMessage = () => {
-  //   friendCurrent &&
-  //     socket?.emit("sendMessage", {
-  //       recipientId: userId,
-  //       senderId: friendCurrent.otherUserId,
-  //     });
-  // };
+  useEffect(() => {
+    const socket = hostSocket && io(hostSocket, {});
+    if (socket) {
+      socket.on("replyMessageRes", (data: IReplyMessageRes) => {
+        setConversation(data.chatDetail);
+        setListFriend(data.conversations);
+      });
+    } else {
+      console.error("Could not socket connect");
+    }
+    return () => {
+      socket && socket.disconnect();
+    };
+  }, [friendCurrent]);
+
+  useEffect(() => {
+    if (friendCurrent && socket) {
+      getMessage(socket, friendCurrent?.otherUserId, friendCurrent?.currentUserId);
+    } else {
+      console.error(`Has not friendCurrent: ${friendCurrent} or socket: ${socket}`);
+    }
+  }, [friendCurrent, socket]);
+
+  const getMessage = async (socket: Socket, senderId: string, recipientId: string) => {
+    try {
+      const payload = {
+        recipientId: recipientId,
+        senderId: senderId,
+      };
+      socket.emit("getMessage", payload);
+    } catch (error) {
+      console.error("Error connect:", error);
+    }
+  };
 
   useEffect(() => {
     console.log("Conversation updated:", conversation);
@@ -76,30 +121,6 @@ export default function Page() {
   // useEffect(() => {
   //   scrollToBottom()
   // }, [conversation])
-
-  useEffect(() => {
-    const fetchListFriendChat = async () => {
-      if (userId) {
-        const response = await fetch(
-          `http://localhost:8000/api/messages/getChatListUser/${userId}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          },
-        );
-        const data = await response.json();
-        setListFriend(data.result);
-
-        if (data.result[0]) {
-          setFriendCurrent(data.result[0]);
-        }
-      }
-    };
-
-    fetchListFriendChat();
-  }, [userId]);
 
   // useEffect(() => {
   //   const fetchChatDetail = async () => {
@@ -240,9 +261,6 @@ export default function Page() {
                     data-chat='person1'
                     key={item._id}
                     onClick={() => {
-                      // setOtherUserId(item.otherUserId)
-                      // setName(item.name)
-                      // setSenderAvatar(item.avatarPath)
                       setFriendCurrent(item);
                     }}
                   >
@@ -320,7 +338,7 @@ export default function Page() {
               senderAvatar={friendCurrent?.avatarPath || ""}
               name={friendCurrent?.name || ""}
             />
-             <ChatForm
+            <ChatForm
               socket={socket}
               senderId={userId}
               recipientId={friendCurrent?.otherUserId || ""}

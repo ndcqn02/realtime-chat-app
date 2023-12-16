@@ -1,7 +1,7 @@
+import React, { useEffect, useRef } from "react";
 import { IChat } from "@/constant";
 import Image from "next/image";
 import "@/styles/Message.css";
-import React from "react";
 import { formatDateTime } from "@/utils/utils";
 
 interface IConversationProps {
@@ -10,24 +10,30 @@ interface IConversationProps {
   name: string;
   senderAvatar: string;
 }
+
 export const Conversation: React.FC<IConversationProps> = ({
   conversation,
   userId,
   senderAvatar,
   name,
 }) => {
-  console.log("🚀 ~ file: index.tsx:10 ~ conversation:", conversation);
+  const chatBoxRef = useRef<HTMLUListElement>(null);
+
+  useEffect(() => {
+    // Scroll to the bottom when conversation changes
+    if (chatBoxRef.current) {
+      chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+    }
+  }, [conversation]);
+
   return (
     <div className='chat-container'>
-      <ul className='chat-box chatContainerScroll'>
+      <ul className='chat-box chatContainerScroll' ref={chatBoxRef}>
         {Array.isArray(conversation) &&
           conversation.length > 0 &&
           conversation.map((message) =>
             message.senderId === userId ? (
-              <li
-                key={message.createdAt}
-                className='chat-right'
-              >
+              <li key={message.createdAt} className='chat-right'>
                 <div className='chat-hour'>
                   {formatDateTime(message.createdAt || '')}
                   <span className='fa fa-check-circle'></span>
@@ -37,10 +43,7 @@ export const Conversation: React.FC<IConversationProps> = ({
                 </div>
               </li>
             ) : (
-              <li
-                key={message.createdAt}
-                className='chat-left'
-              >
+              <li key={message.createdAt} className='chat-left'>
                 <div className='chat-avatar'>
                   <Image
                     height={100}

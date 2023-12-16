@@ -1358,7 +1358,10 @@ form button {
     vertical-align: middle;
     width: 8%;
 }
-
+.friend-info > a {
+    float: right; 
+    margin-right :50px;
+}
 .friend-name {
     display: inline-block;
     padding-left: 10px;
@@ -10115,7 +10118,6 @@ aside.sidebar.full-style {
     display: flex;
 }
 .layout-left-home{
-    margin-left: 5%;
     position: relative;
     width: 25%;
     background: #ffffff;
@@ -10167,3 +10169,148 @@ aside.sidebar.full-style {
 .nav a:hover {
     color: #00fe2a; /* Màu văn bản khi di chuột qua liên kết */
 }
+.dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 170px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 0;
+    right: 0;  
+  }
+  .dropdown-content li {
+    list-style-type: none; 
+  }
+  .dropdown-content a {
+    float: none;  
+  }
+  
+  .dropdown-content a:hover {
+    background-color: #00fd2a;
+  }
+  
+  .dropdown:hover .dropdown-content {
+    display: block;
+  }
+
+
+
+  /* Style cho modal overlay */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 10000; /* Thiết lập z-index ở mức đủ lớn */
+  }
+  
+  /* Style cho modal content */
+  .modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    z-index: 10000; /* Thiết lập z-index cao hơn so với overlay */
+  }
+  
+  /* Style cho nút đóng modal */
+  .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+  }
+  
+  /* Style cho nút lưu và hủy */
+  .save-update {
+    background-color: #4caf50;
+    color: #fff;
+    padding: 5px 20px;
+    margin: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .cancel-update {
+    background-color: #f44535;
+    color: #fff;
+    padding: 5px 20px;
+    margin: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  /* Style cho hình ảnh và mô tả */
+  .image-preview {
+    margin-bottom: 20px;
+  }
+  
+  .description-input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+  }
+ 
+  .delete_img {
+    color: #df2506;
+    border: none;  
+    border-radius: 4px;
+    cursor: pointer;
+    width: 30;
+  }
+  
+  /* Hiển thị modal khi có class "show-modal" */
+  .show-modal .modal-overlay {
+    display: flex;
+  }
+  .edit-modal {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70%; /* Chiếm 50% chiều ngang của màn hình */
+    background-color: white;
+    padding-left: 20px;
+    padding-right: 20px;
+    z-index: 100000;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  .edit-modal img {
+    max-width: 50%; /* Hình ảnh sẽ không vượt quá chiều rộng của cha */
+    height: auto; /* Duy trì tỉ lệ khung hình khi giảm kích thước */
+  }
+  .edit-modal h2 {
+    text-align: center;/* Duy trì tỉ lệ khung hình khi giảm kích thước */
+  }
+  .delete-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    z-index: 10002;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  .ul{
+    padding-right: 20px;
+  }
+  .m-r-20{
+    margin-right: 20px;
+  }

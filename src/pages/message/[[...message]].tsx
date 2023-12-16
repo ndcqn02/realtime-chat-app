@@ -30,7 +30,7 @@ export default function Page() {
   const [listFriend, setListFriend] = useState<IFriendChat[]>([]);
   const [socket, setSocket] = useState<Socket>();
   const [isReload, setIsReload] = useState<boolean>(false);
-
+  const containerRef = useRef<HTMLDivElement>(null);
   const [friendCurrent, setFriendCurrent] = useState<IFriendChat>();
   const { isLoaded, userId } = useAuth();
 
@@ -104,7 +104,23 @@ export default function Page() {
     console.log("Conversation updated:", conversation);
   }, [conversation]);
 
-  
+  const scrollToBottom = () => {
+    console.log("containerRef", containerRef);
+
+    if (containerRef.current) {
+      // containerRef.current.scrollTop = containerRef.current.scrollHeight
+      containerRef.current.scrollTo({
+        left: 0,
+        top: containerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+      console.log("containerRef.current.scrollHeight", containerRef.current.scrollHeight);
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [conversation])
 
   if (!isLoaded || !userId) {
     return null;

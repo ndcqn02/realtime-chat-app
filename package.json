@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^4.25.4",
+    "@types/socket.io": "^3.0.2",
     "cors": "^2.8.5",
     "next": "13.5.4",
     "nextjs-websocket": "^1.0.11",

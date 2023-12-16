@@ -1,124 +1,172 @@
-import '@clerk/nextjs'
-import '@/styles/Message.css'
-import 'next/app'
-import Image from 'next/image'
-import ChatForm from '@/components/chatForm'
-import { useEffect, useState } from 'react'
+import "@clerk/nextjs";
+import "@/styles/Message.css";
+import "next/app";
+import Image from "next/image";
+import ChatForm from "@/components/chatForm";
+import { useEffect, useRef, useState } from "react";
+import { useAuth, useUser } from "@clerk/nextjs";
+import io, { Socket } from "socket.io-client";
+import { IChat, hostSocket } from "@/constant";
+import { Conversation } from "@/components/conversation";
 
-const listFriendChat = [
-  {
-    avatarPath: 'https://www.bootdey.com/img/Content/avatar/avatar3.png',
-    name: 'Emily Russell',
-    createAt: '15/02/2019',
-    message: 'Hi, Russell',
-  },
-  {
-    avatarPath: 'https://www.bootdey.com/img/Content/avatar/avatar3.png',
-    name: 'Emily Russell',
-    createAt: '15/02/2019',
-    message: 'Hi, Russell',
-  },
-  {
-    avatarPath: 'https://www.bootdey.com/img/Content/avatar/avatar3.png',
-    name: 'Emily Russell',
-    createAt: '15/02/2019',
-    message: 'Hi, Russell',
-  },
-]
+export interface IFriendChat {
+  _id: string;
+  otherUserId: string;
+  currentUserId: string;
+  createdAt: string;
+  lastedMessage: string;
+  avatarPath: string;
+  name: string;
+}
 
-const userId = 'user_2WnkbS2Yl0i2lKN3pxN3qXajNgM'
-
-const listMessage = [
-  {
-    senderId: '12345',
-    recipientId: 'user123',
-    senderAvatar: 'https://www.bootdey.com/img/Content/avatar/avatar3.png',
-    message: 'Chào bạn! Đây là tin nhắn phản hồi từ bot.',
-    createAt: '15/02/2019 08:56',
-  },
-  {
-    senderId: 'user123',
-    recipientId: 'user123',
-    senderAvatar: 'https://www.bootdey.com/img/Content/avatar/avatar3.png',
-    message: 'Tao ne may',
-    createAt: '15/02/2019 08:56',
-  }
-]
-
-export interface IChat {
-  _id: string
-  message: string
-  senderId: string
-  recipientId: string
-  createdAt?: string
-  senderAvatar: string
-  __v?: number
+interface IResponse {
+  message: "";
+  result: any[];
 }
 
 export default function Page() {
-  const [chat, setChat] = useState<IChat[]>([])
+  const [conversation, setConversation] = useState<IChat[]>([]);
+  const [listFriend, setListFriend] = useState<IFriendChat[]>([]);
+  const [socket, setSocket] = useState<Socket | null>(null);
+
+  const [friendCurrent, setFriendCurrent] = useState<IFriendChat>();
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { isLoaded, userId } = useAuth();
 
   useEffect(() => {
-    const fetchChatDetail = async () => {
-      const response = await fetch(
-        'http://localhost:8000/api/messages/chat/user_2WnkbS2Yl0i2lKN3pxN3qXajNgM/user_2Xo1uuwA1hqvwPGVsdOe78nQrDk',
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      )
-      const data = await response.json()
-      console.log('🚀 ~ file: [[...message]].tsx:84 ~ fetchChatDetail ~ result:', data)
+    const newSocket = hostSocket && io(hostSocket, {});
+    newSocket && setSocket(newSocket);
+    newSocket &&
+      newSocket.on("messageResponse", (data: IChat[]) => {
+        setConversation(data);
+      });
 
-      setChat(data.result)
+    return () => {
+      newSocket && newSocket.disconnect();
+    };
+  }, []);
+
+  // const sendMessage = () => {
+  //   friendCurrent &&
+  //     socket?.emit("sendMessage", {
+  //       recipientId: userId,
+  //       senderId: friendCurrent.otherUserId,
+  //     });
+  // };
+
+  useEffect(() => {
+    console.log("Conversation updated:", conversation);
+  }, [conversation]);
+
+  const scrollToBottom = () => {
+    console.log("containerRef", containerRef);
+
+    if (containerRef.current) {
+      // containerRef.current.scrollTop = containerRef.current.scrollHeight
+      containerRef.current.scrollTo({
+        left: 0,
+        top: containerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+      console.log("containerRef.current.scrollHeight", containerRef.current.scrollHeight);
     }
+  };
 
-    fetchChatDetail()
-  }, [])
+  // useEffect(() => {
+  //   scrollToBottom()
+  // }, [conversation])
+
+  useEffect(() => {
+    const fetchListFriendChat = async () => {
+      if (userId) {
+        const response = await fetch(
+          `http://localhost:8000/api/messages/getChatListUser/${userId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          },
+        );
+        const data = await response.json();
+        setListFriend(data.result);
+
+        if (data.result[0]) {
+          setFriendCurrent(data.result[0]);
+        }
+      }
+    };
+
+    fetchListFriendChat();
+  }, [userId]);
+
+  // useEffect(() => {
+  //   const fetchChatDetail = async () => {
+  //     if (userId && friendCurrent?.otherUserId) {
+  //       const response = await fetch(
+  //         `http://localhost:8000/api/messages/chat/${userId}/${friendCurrent.otherUserId}`,
+  //         {
+  //           method: 'GET',
+  //           headers: {
+  //             'Content-Type': 'application/json',
+  //           },
+  //         },
+  //       )
+  //       const data = await response.json()
+
+  //       setConversation(data.result)
+  //     }
+  //   }
+
+  //   fetchChatDetail()
+  // }, [userId, friendCurrent?.otherUserId])
+
+  if (!isLoaded || !userId) {
+    return null;
+  }
 
   return (
-    <div className="layout">
-      <div className="fixed-top">
+    <div className='layout'>
+      <div className='fixed-top'>
         <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+          rel='stylesheet'
+          href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css'
         />
-        <div className="page-title">
-          <div className="row">
+        <div className='page-title'>
+          <div className='row'>
             <h4>Chat Web App</h4>
             <Image
               height={200}
               width={200}
-              src="https://www.bootdey.com/img/Content/avatar/avatar5.png"
-              alt="Retail Admin"
+              src='https://www.bootdey.com/img/Content/avatar/avatar5.png'
+              alt='Retail Admin'
             />
           </div>
         </div>
-        <div className="top-bar">
-          <div className="navbar">
-            <a href="home">
-              <i className="fas fa-home"></i>
+        <div className='top-bar'>
+          <div className='navbar'>
+            <a href='home'>
+              <i className='fas fa-home'></i>
             </a>
-            <a href="message">
-              <i className="far fa-comment-dots"></i>
+            <a href='message'>
+              <i className='far fa-comment-dots'></i>
             </a>
-            <a href="#">
-              <i className="fas fa-users"></i>
+            <a href='#'>
+              <i className='fas fa-users'></i>
             </a>
-            <a href="#">
-              <i className="far fa-bell"></i>
+            <a href='#'>
+              <i className='far fa-bell'></i>
             </a>
           </div>
         </div>
       </div>
-      <div className="card m-0">
-        <div className="layout-main">
-          <div className="layout-left">
-            <div className="users-container">
-              <div className="box">
-                <div className="container-1">
+      <div className='card m-0'>
+        <div className='layout-main'>
+          <div className='layout-left'>
+            <div className='users-container'>
+              <div className='box'>
+                <div className='container-1'>
                   <p>
                     <strong>Active users</strong>
                   </p>
@@ -126,76 +174,93 @@ export default function Page() {
                   <Image
                     height={200}
                     width={200}
-                    src="https://www.bootdey.com/img/Content/avatar/avatar1.png"
-                    alt="Retail Admin"
-                    className="avt-new"
+                    src='https://www.bootdey.com/img/Content/avatar/avatar1.png'
+                    alt='Retail Admin'
+                    className='avt-new'
                   />
 
                   <Image
                     height={200}
                     width={200}
-                    src="https://www.bootdey.com/img/Content/avatar/avatar2.png"
-                    alt="Retail Admin"
-                    className="avt-new"
+                    src='https://www.bootdey.com/img/Content/avatar/avatar2.png'
+                    alt='Retail Admin'
+                    className='avt-new'
                   />
 
                   <Image
                     height={200}
                     width={200}
-                    src="https://www.bootdey.com/img/Content/avatar/avatar3.png"
-                    alt="Retail Admin"
-                    className="avt-new"
+                    src='https://www.bootdey.com/img/Content/avatar/avatar3.png'
+                    alt='Retail Admin'
+                    className='avt-new'
                   />
                   <Image
                     height={200}
                     width={200}
-                    src="https://www.bootdey.com/img/Content/avatar/avatar4.png"
-                    alt="Retail Admin"
-                    className="avt-new"
+                    src='https://www.bootdey.com/img/Content/avatar/avatar4.png'
+                    alt='Retail Admin'
+                    className='avt-new'
                   />
 
                   <Image
                     height={200}
                     width={200}
-                    src="https://www.bootdey.com/img/Content/avatar/avatar5.png"
-                    alt="Retail Admin"
-                    className="avt-new"
+                    src='https://www.bootdey.com/img/Content/avatar/avatar5.png'
+                    alt='Retail Admin'
+                    className='avt-new'
                   />
                 </div>
               </div>
-              <div className="box">
-                <div className="container-1">
-                  <span className="icon">
-                    <i className="fa fa-search" style={{ color: '#b4b5b6' }}></i>
+              <div className='box'>
+                <div className='container-1'>
+                  <span className='icon'>
+                    <i
+                      className='fa fa-search'
+                      style={{ color: "#b4b5b6" }}
+                    ></i>
                   </span>
-                  <input type="search" id="search" placeholder="Search or star new chat" />
+                  <input
+                    type='search'
+                    id='search'
+                    placeholder='Search or star new chat'
+                  />
                 </div>
               </div>
-              <div className="box">
-                <div className="container-1">
+              <div className='box'>
+                <div className='container-1'>
                   <h5>ALL CHATS</h5>
                 </div>
               </div>
 
               {/* Left slide */}
-              <ul className="users">
-                {listFriendChat.map((item) => (
-                  <li className="person active-user" data-chat="person1" key={item.name}>
-                    <div className="user">
+              <ul className='users'>
+                {listFriend.map((item) => (
+                  <li
+                    className='person active-user'
+                    data-chat='person1'
+                    key={item._id}
+                    onClick={() => {
+                      // setOtherUserId(item.otherUserId)
+                      // setName(item.name)
+                      // setSenderAvatar(item.avatarPath)
+                      setFriendCurrent(item);
+                    }}
+                  >
+                    <div className='user'>
                       <Image
                         height={200}
                         width={200}
                         src={item.avatarPath} // Use the avatarPath from the item
                         alt={item.name}
                       />
-                      <span className="status online"></span>
+                      <span className='status online'></span>
                     </div>
-                    <div className="group-name-time">
-                      <div className="name-time">
-                        <p className="name">{item.name}</p>
-                        <p className="time">{item.createAt}</p>
+                    <div className='group-name-time'>
+                      <div className='name-time'>
+                        <p className='name'>{item.name}</p>
+                        <p className='time'>{item.createdAt}</p>
                       </div>
-                      <p className="content">{item.message}</p>
+                      <p className='content'>{item.lastedMessage}</p>
                     </div>
                   </li>
                 ))}
@@ -203,74 +268,66 @@ export default function Page() {
             </div>
           </div>
 
-          <div className="layout-center">
-            <div className="selected-user">
-              <div className="name-chat">
+          <div className='layout-center'>
+            <div className='selected-user'>
+              <div className='name-chat'>
                 <Image
                   height={200}
                   width={200}
-                  src="https://www.bootdey.com/img/Content/avatar/avatar3.png"
-                  alt="Retail Admin"
+                  src={friendCurrent?.avatarPath || ""}
+                  alt={friendCurrent?.name || ""}
                 />
                 <div>
-                  <span className="name">Emily Russell</span>
-                  <p className="content">online</p>
+                  <span className='name'>{friendCurrent?.name}</span>
+                  <p className='content'>online</p>
                 </div>
               </div>
               <div>
-                <button type="button" className="btn ">
-                  <i className="fas fa-video" style={{ color: '#b8b8b8' }}></i>
+                <button
+                  type='button'
+                  className='btn '
+                >
+                  <i
+                    className='fas fa-video'
+                    style={{ color: "#b8b8b8" }}
+                  ></i>
                 </button>
-                <button type="button" className="btn ">
-                  <i className="fas fa-phone-alt" style={{ color: '#b8b8b8' }}></i>
+                <button
+                  type='button'
+                  className='btn '
+                >
+                  <i
+                    className='fas fa-phone-alt'
+                    style={{ color: "#b8b8b8" }}
+                  ></i>
                 </button>
-                <button type="button" className="btn ">
-                  <i className="fas fa-ellipsis-v" style={{ color: '#b8b8b8' }}></i>
+                <button
+                  type='button'
+                  className='btn '
+                >
+                  <i
+                    className='fas fa-ellipsis-v'
+                    style={{ color: "#b8b8b8" }}
+                  ></i>
                 </button>
               </div>
             </div>
 
             {/* chat session */}
-            <div className="chat-container">
-              <ul className="chat-box chatContainerScroll">
-                {Array.isArray(chat) &&
-                  chat.length > 0 &&
-                  chat.map((message) =>
-                    message.senderId === userId ? (
-                      <li key={message.createdAt} className="chat-left">
-                        <div className="chat-avatar">
-                          <Image
-                          height={100}
-                          width={100}
-                          src={message.senderAvatar}
-                          alt="Retail Admin"
-                        />
-                        </div>
-                        <div className="chat-text-left">
-                          <p> {message.message}</p>
-                        </div>
-                        <div className="chat-hour">
-                          {message.createdAt}
-                          <span className="fa fa-check-circle"></span>
-                        </div>
-                      </li>
-                    ) : (
-                      <li key="sender" className="chat-right">
-                        <div className="chat-hour">
-                          {message.createdAt} <span className="fa fa-check-circle"></span>
-                        </div>
-                        <div className="chat-text-right">
-                          <p>{message.message}</p>
-                        </div>
-                      </li>
-                    ),
-                  )}
-              </ul>
-            </div>
-            <ChatForm />
+            <Conversation
+              conversation={conversation}
+              userId={userId}
+              senderAvatar={friendCurrent?.avatarPath || ""}
+              name={friendCurrent?.name || ""}
+            />
+             <ChatForm
+              socket={socket}
+              senderId={userId}
+              recipientId={friendCurrent?.otherUserId || ""}
+            />
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

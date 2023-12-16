@@ -1,8 +1,10 @@
 import React, { useState, KeyboardEvent } from 'react'
 import { useRouter } from 'next/router'
-import io from 'socket.io-client'
+import io, { Socket } from 'socket.io-client'
+import { hostSocket } from '@/constant'
+// import { Socket } from 'socket.io'
 
-let socket: any
+
 
 interface ISendMessage {
   senderId: string
@@ -10,7 +12,13 @@ interface ISendMessage {
   message: string
 }
 
-const ChatForm: React.FC = () => {
+interface ChatFormProps {
+  socket: Socket
+  senderId: string
+  recipientId: string
+}
+
+const ChatForm: React.FC<ChatFormProps> = (props) => {
   const [message, setMessage] = useState('')
   const router = useRouter()
 
@@ -23,23 +31,27 @@ const ChatForm: React.FC = () => {
 
   const sendMessage = async () => {
     try {
-      const hostSocket = process.env.NEXT_PUBLIC_HOST_SOCKET
-      if (hostSocket) {
-        socket = io(hostSocket, {})
-      } else {
-        console.error('Not have URI hostSocket ')
+      // if (hostSocket) {
+      //   socket = io(hostSocket, {})
+      // } else {
+      //   console.error('Not have URI hostSocket ')
+      // }
+
+      if (!props.socket) {
+        return;
       }
 
       const messageData: ISendMessage = {
-        senderId: 'user_2WnkbS2Yl0i2lKN3pxN3qXajNgM',
-        recipientId: 'user_2Xo1uuwA1hqvwPGVsdOe78nQrDk',
+        senderId: props.senderId,
+        recipientId: props.recipientId,
         message: message,
       }
 
-      socket.on('connect', () => {
-        console.log('connected')
-        socket.emit('sendMessage', messageData)
-      })
+      // socket.on('connect', () => {
+      //   console.log('connected')
+      //   socket.emit('sendMessage', messageData)
+      // })
+      props.socket.emit('sendMessage', messageData)
 
       setMessage('')
     } catch (error) {

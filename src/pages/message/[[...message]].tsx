@@ -8,6 +8,7 @@ import { useAuth } from "@clerk/nextjs";
 import io, { Socket } from "socket.io-client";
 import { IChat, hostSocket } from "@/constant";
 import { Conversation } from "@/components/conversation";
+import { UserButton } from "@clerk/nextjs";
 
 export interface IFriendChat {
   _id: string;
@@ -37,7 +38,7 @@ export default function Page() {
   useEffect(() => {
     const fetchListFriendChat = async () => {
       if (userId) {
-        console.log("🚀 ~ file: [[...message]].tsx:40 ~ fetchListFriendChat ~ userId:", userId)
+        console.log("🚀 ~ file: [[...message]].tsx:40 ~ fetchListFriendChat ~ userId:", userId);
         const response = await fetch(
           `http://localhost:8000/api/messages/getChatListUser/${userId}`,
           {
@@ -63,6 +64,15 @@ export default function Page() {
   useEffect(() => {
     const newSocket = hostSocket && io(hostSocket, {});
     newSocket && setSocket(newSocket);
+
+    newSocket &&
+      newSocket.on("messageResponse", (data: IChat[]) => {
+        setConversation(data);
+      });
+
+    return () => {
+      newSocket && newSocket.disconnect();
+    };
   }, []);
 
   useEffect(() => {
@@ -157,12 +167,7 @@ export default function Page() {
         <div className='page-title'>
           <div className='row'>
             <h4>Chat Web App</h4>
-            <Image
-              height={200}
-              width={200}
-              src='https://www.bootdey.com/img/Content/avatar/avatar5.png'
-              alt='Retail Admin'
-            />
+            <UserButton afterSignOutUrl='/' />
           </div>
         </div>
         <div className='top-bar'>

@@ -2,6 +2,7 @@ import '@clerk/nextjs'
 import '@/styles/Message.css'
 import '@/styles/Home.css'
 import 'next/app'
+import { UserButton } from '@clerk/nextjs'
 
 export default function Page() {
   return (
@@ -14,7 +15,7 @@ export default function Page() {
         <div className="page-title">
           <div className="row">
             <h4>Chat Web App</h4>
-            <img src="https://www.bootdey.com/img/Content/avatar/avatar5.png" alt="Retail Admin" />
+            <UserButton afterSignOutUrl="/" />
           </div>
         </div>
         <div className="top-bar">
@@ -45,9 +46,9 @@ export default function Page() {
                 <a href="home" title="">
                   Trang chủ
                 </a>
-              </li>            
+              </li>
               <li>
-              <i className="fas fa-users"></i>
+                <i className="fas fa-users"></i>
                 <a href="" title="">
                   Nhóm
                 </a>
@@ -70,17 +71,11 @@ export default function Page() {
                   Video
                 </a>
               </li>
-              
-               <li>
-               <i className="fas fa-gamepad"></i>
+
+              <li>
+                <i className="fas fa-gamepad"></i>
                 <a href="" title="">
                   Chơi game
-                </a>
-              </li>
-              <li>
-                <i className="fas fa-power-off"></i>
-                <a href="sign-in" title="">
-                  Đăng xuất
                 </a>
               </li>
             </ul>

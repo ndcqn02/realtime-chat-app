@@ -30,11 +30,14 @@ export default function Page() {
   const [listFriend, setListFriend] = useState<IFriendChat[]>([]);
   const [socket, setSocket] = useState<Socket>();
   const [isReload, setIsReload] = useState<boolean>(false);
-
-  const [friendCurrent, setFriendCurrent] = useState<IFriendChat>();
-
   const containerRef = useRef<HTMLDivElement>(null);
+  const [friendCurrent, setFriendCurrent] = useState<IFriendChat>();
   const { isLoaded, userId } = useAuth();
+
+  useEffect(() => {
+    const socket = hostSocket && io(hostSocket, {});
+    socket && setSocket(socket);
+  }, []);
 
   useEffect(() => {
     const fetchListFriendChat = async () => {
@@ -59,10 +62,7 @@ export default function Page() {
     fetchListFriendChat();
   }, [userId, isReload]);
 
-  useEffect(() => {
-    const socket = hostSocket && io(hostSocket, {});
-    socket && setSocket(socket);
-  }, []);
+
 
   useEffect(() => {
     const socket = hostSocket && io(hostSocket, {});
@@ -118,11 +118,9 @@ export default function Page() {
     }
   };
 
-  // useEffect(() => {
-  //   scrollToBottom()
-  // }, [conversation])
-
-
+  useEffect(() => {
+    scrollToBottom()
+  }, [conversation])
 
   if (!isLoaded || !userId) {
     return null;
@@ -315,7 +313,6 @@ export default function Page() {
               name={friendCurrent?.name || ""}
             />
             <ChatForm
-              socket={socket}
               senderId={userId}
               recipientId={friendCurrent?.otherUserId || ""}
               onSendMessage={() => {

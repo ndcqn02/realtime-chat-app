@@ -167,7 +167,7 @@ export default function Page() {
         <div className='page-title'>
           <div className='row'>
             <h4>Chat Web App</h4>
-            <UserButton afterSignOutUrl='/' />
+            <UserButton afterSignOutUrl='/sign-in' />
           </div>
         </div>
         <div className='top-bar'>

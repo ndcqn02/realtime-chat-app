@@ -10115,6 +10115,7 @@ aside.sidebar.full-style {
     display: flex;
 }
 .layout-left-home{
+    margin-left: 5%;
     position: relative;
     width: 25%;
     background: #ffffff;

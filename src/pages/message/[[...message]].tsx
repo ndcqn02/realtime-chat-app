@@ -8,6 +8,7 @@ import { useAuth, useUser } from "@clerk/nextjs";
 import io, { Socket } from "socket.io-client";
 import { IChat, hostSocket } from "@/constant";
 import { Conversation } from "@/components/conversation";
+import { UserButton } from '@clerk/nextjs'
 
 export interface IFriendChat {
   _id: string;
@@ -35,16 +36,16 @@ export default function Page() {
   const { isLoaded, userId } = useAuth();
 
   useEffect(() => {
-    const newSocket = hostSocket && io(hostSocket, {});
-    newSocket && setSocket(newSocket);
-    newSocket &&
-      newSocket.on("messageResponse", (data: IChat[]) => {
-        setConversation(data);
-      });
+  const newSocket = hostSocket && io(hostSocket, {});
+  newSocket && setSocket(newSocket);
+  newSocket &&
+  newSocket.on("messageResponse", (data: IChat[]) => {
+  setConversation(data);
+  });
 
-    return () => {
-      newSocket && newSocket.disconnect();
-    };
+  return () => {
+  newSocket && newSocket.disconnect();
+  };
   }, []);
 
   // const sendMessage = () => {
@@ -102,24 +103,24 @@ export default function Page() {
   }, [userId]);
 
   // useEffect(() => {
-  //   const fetchChatDetail = async () => {
-  //     if (userId && friendCurrent?.otherUserId) {
-  //       const response = await fetch(
-  //         `http://localhost:8000/api/messages/chat/${userId}/${friendCurrent.otherUserId}`,
-  //         {
+    //   const fetchChatDetail = async () => {
+      //     if (userId && friendCurrent?.otherUserId) {
+        //       const response = await fetch(
+          //         `http://localhost:8000/api/messages/chat/${userId}/${friendCurrent.otherUserId}`,
+          //         {
   //           method: 'GET',
-  //           headers: {
-  //             'Content-Type': 'application/json',
-  //           },
-  //         },
-  //       )
+            //           headers: {
+              //             'Content-Type': 'application/json',
+            //           },
+          //         },
+        //       )
   //       const data = await response.json()
 
-  //       setConversation(data.result)
-  //     }
+        //       setConversation(data.result)
+      //     }
   //   }
 
-  //   fetchChatDetail()
+    //   fetchChatDetail()
   // }, [userId, friendCurrent?.otherUserId])
 
   if (!isLoaded || !userId) {
@@ -136,12 +137,8 @@ export default function Page() {
         <div className='page-title'>
           <div className='row'>
             <h4>Chat Web App</h4>
-            <Image
-              height={200}
-              width={200}
-              src='https://www.bootdey.com/img/Content/avatar/avatar5.png'
-              alt='Retail Admin'
-            />
+            <UserButton afterSignOutUrl="/" />
+            
           </div>
         </div>
         <div className='top-bar'>
@@ -320,7 +317,7 @@ export default function Page() {
               senderAvatar={friendCurrent?.avatarPath || ""}
               name={friendCurrent?.name || ""}
             />
-             <ChatForm
+            <ChatForm
               socket={socket}
               senderId={userId}
               recipientId={friendCurrent?.otherUserId || ""}

@@ -1,6 +1,8 @@
 import { IChat } from "@/constant";
 import Image from "next/image";
+import "@/styles/Message.css";
 import React from "react";
+import { formatDateTime } from "@/utils/utils";
 
 interface IConversationProps {
   conversation: IChat[];
@@ -27,7 +29,8 @@ export const Conversation: React.FC<IConversationProps> = ({
                 className='chat-right'
               >
                 <div className='chat-hour'>
-                  {message.createdAt} <span className='fa fa-check-circle'></span>
+                  {formatDateTime(message.createdAt || '')}
+                  <span className='fa fa-check-circle'></span>
                 </div>
                 <div className='chat-text-right'>
                   <p>{message.message}</p>
@@ -50,7 +53,7 @@ export const Conversation: React.FC<IConversationProps> = ({
                   <p> {message.message}</p>
                 </div>
                 <div className='chat-hour'>
-                  {message.createdAt}
+                  {formatDateTime(message.createdAt || '')}
                   <span className='fa fa-check-circle'></span>
                 </div>
               </li>

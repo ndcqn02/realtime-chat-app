@@ -63,8 +63,6 @@ export default function Page() {
     fetchListFriendChat();
   }, [userId, isReload]);
 
-
-
   useEffect(() => {
     const socket = hostSocket && io(hostSocket, {});
     if (socket) {
@@ -120,8 +118,8 @@ export default function Page() {
   };
 
   useEffect(() => {
-    scrollToBottom()
-  }, [conversation])
+    scrollToBottom();
+  }, [conversation]);
 
   if (!isLoaded || !userId) {
     return null;
@@ -145,7 +143,10 @@ export default function Page() {
             <a href='home'>
               <i className='fas fa-home'></i>
             </a>
-            <a href='message' style={{ color: '#00fe2a'}}>
+            <a
+              href='message'
+              style={{ color: "#00fe2a" }}
+            >
               <i className='far fa-comment-dots'></i>
             </a>
             <a href='#'>
@@ -166,45 +167,18 @@ export default function Page() {
                   <p>
                     <strong>Active users</strong>
                   </p>
-
-                  <Image
-                    height={200}
-                    width={200}
-                    src='https://www.bootdey.com/img/Content/avatar/avatar1.png'
-                    alt='Retail Admin'
-                    className='avt-new'
-                  />
-
-                  <Image
-                    height={200}
-                    width={200}
-                    src='https://www.bootdey.com/img/Content/avatar/avatar2.png'
-                    alt='Retail Admin'
-                    className='avt-new'
-                  />
-
-                  <Image
-                    height={200}
-                    width={200}
-                    src='https://www.bootdey.com/img/Content/avatar/avatar3.png'
-                    alt='Retail Admin'
-                    className='avt-new'
-                  />
-                  <Image
-                    height={200}
-                    width={200}
-                    src='https://www.bootdey.com/img/Content/avatar/avatar4.png'
-                    alt='Retail Admin'
-                    className='avt-new'
-                  />
-
-                  <Image
-                    height={200}
-                    width={200}
-                    src='https://www.bootdey.com/img/Content/avatar/avatar5.png'
-                    alt='Retail Admin'
-                    className='avt-new'
-                  />
+                  {listFriend.map((friend) => {
+                    return (
+                      <Image
+                        key={friend._id}
+                        height={200}
+                        width={200}
+                        src={friend.avatarPath}
+                        alt='Retail Admin'
+                        className='avt-new'
+                      />
+                    );
+                  })}
                 </div>
               </div>
               <div className='box'>
@@ -251,7 +225,7 @@ export default function Page() {
                     <div className='group-name-time'>
                       <div className='name-time'>
                         <p className='name'>{item.name}</p>
-                        <p className='time'>{formatDateTime(item.createdAt || '')}</p>
+                        <p className='time'>{formatDateTime(item.createdAt || "")}</p>
                       </div>
                       <p className='content'>{item.lastedMessage}</p>
                     </div>

@@ -125,22 +125,25 @@ export const CommentComponent: React.FC<ICommentProps> = ({
               </div>
               <div className='we-comment'>
                 <div className='coment-head'>
-                  <h5>
+                  <div>
                     <a
+                      style={{ marginRight: '10px' }}
                       href='time-line.html'
                       title=''
                     >
-                      {comment.name}
+                      <b>{comment.name}</b>
                     </a>
-                  </h5>
-                  <span>{formatDateTime(comment.createdAt || "")}</span>
-                  <a
-                    className='we-reply'
-                    href='#'
-                    title='Reply'
-                  >
-                    <i className='fa fa-reply'></i>
-                  </a>
+                    <span>{formatDateTime(comment.createdAt || "")}</span>
+                    <a
+                      className='we-reply'
+                      href='#'
+                      title='Reply'
+                    >
+                      <i className='fa fa-reply'></i>
+                    </a>
+
+                  </div>
+
                   <div
                     className='dropdown'
                     style={{ float: "right", marginRight: "30px" }}
@@ -152,18 +155,18 @@ export const CommentComponent: React.FC<ICommentProps> = ({
                       className='dropdown-content'
                       id='myDropdown'
                     >
-                      <ul className='ul'>
-                        <li>
+                      <div className="ul">
+                        <div>
                           <a onClick={() => handleCommentEditClick(comment)}>
                             <i className='fas fa-pencil-alt'> Chỉnh sửa</i>
                           </a>
-                        </li>
-                        <li>
+                        </div>
+                        <div>
                           <a onClick={() => handleCommentDeleteClick(comment)}>
                             <i className='fas fa-trash-alt'> Xóa</i>
                           </a>
-                        </li>
-                      </ul>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

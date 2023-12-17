@@ -1344,9 +1344,10 @@ form button {
     top: -18px;
     width: 20px;
 }
-
-.friend-info {
+.central-meta{
     border-radius: 15px;
+}
+.friend-info {
     display: inline-block;
     position: relative;
     width: 100%;
@@ -1408,7 +1409,6 @@ form button {
 }
 
 .description > p {
-    margin-bottom: 20px;
 }
 
 .description > span {
@@ -1853,6 +1853,7 @@ for some reason nth-child(1) is always busy and elements starting from 2 */
     display: table-cell;
     margin-left: 20px;
     padding: 10px;
+    border-radius: 15px;
     vertical-align: top;
     position: relative;
     width: 65%;
@@ -1903,7 +1904,8 @@ for some reason nth-child(1) is always busy and elements starting from 2 */
 }
 
 .coment-head {
-    display: inline-block;
+    justify-content: space-between;
+    display: flex;
     width: 100%;
 }
 
@@ -10184,27 +10186,24 @@ aside.sidebar.full-style {
     display: none;
     position: absolute;
     background-color: #f9f9f9;
-    min-width: 170px;
+    min-width: 150px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     z-index: 0;
     right: 0;  
   }
-  .dropdown-content li {
-    list-style-type: none; 
-  }
   .dropdown-content a {
     float: none;  
+    width: 100%;
   }
   
   .dropdown-content a:hover {
+    width: 100%;
     background-color: #00fd2a;
   }
   
   .dropdown:hover .dropdown-content {
     display: block;
   }
-
-
 
   /* Style cho modal overlay */
   .modal-overlay {
@@ -10315,7 +10314,10 @@ aside.sidebar.full-style {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   }
   .ul{
-    padding-right: 20px;
+    padding: 10px 10px 10px 30px;
+  }
+  .li{
+    width: 100px;
   }
   .m-r-20{
     margin-right: 20px;

@@ -222,18 +222,18 @@ export default function Page() {
                             className='dropdown-content'
                             id='myDropdown'
                           >
-                            <ul className='ul'>
-                              <li>
+                            <div className='ul'>
+                              <div>
                                 <a onClick={handleEditClick}>
                                   <i className='fas fa-pencil-alt'> Chỉnh sửa</i>
                                 </a>
-                              </li>
-                              <li>
+                              </div>
+                              <div>
                                 <a onClick={openDeleteModal}>
                                   <i className='fas fa-trash-alt'> Xóa</i>
                                 </a>
-                              </li>
-                            </ul>
+                              </div>
+                            </div>
                           </div>
                         </div>
                         {/* Modal chỉnh sửa */}

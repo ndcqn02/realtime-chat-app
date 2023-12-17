@@ -134,6 +134,15 @@ export default function Page() {
         />
         <div className='page-title'>
           <div className='row'>
+          <Image
+              style={{ height: "40px", width: "170px" }}
+              height={40}
+              width={170}
+              src='/logo.jpg'
+              alt='logo'
+              quality={100}
+              priority
+            />
             <h4>Chat Web App</h4>
             <UserButton afterSignOutUrl='/sign-in' />
           </div>

@@ -10,6 +10,7 @@ interface ICommentProps {
   userCurrentImg: string | undefined;
   userId: string | undefined;
   postId: string | undefined;
+  handleReload: () => void;
 }
 
 export const CommentComponent: React.FC<ICommentProps> = ({
@@ -17,13 +18,18 @@ export const CommentComponent: React.FC<ICommentProps> = ({
   userCurrentImg,
   userId,
   postId,
+  handleReload,
 }) => {
+  const [contentComment, setContentComment] = useState("");
+  const [selectedComment, setSelectedComment] = useState<IComment | null>(null);
+  const [isCommentEditModalOpen, setCommentEditModalOpen] = useState(false);
+  const [isCommentDeleteModalOpen, setCommentDeleteModalOpen] = useState(false);
+  const [commentText, setCommentText] = useState("");
   const [commentBody, setCommentBody] = useState({
     comment: "",
     creatorId: userId,
     postId: postId,
   });
-  const [contentComment, setContentComment] = useState("");
 
   const handleCreateComment = async () => {
     event?.preventDefault();
@@ -37,43 +43,70 @@ export const CommentComponent: React.FC<ICommentProps> = ({
         postId: postId,
       });
     }
+    handleReload();
   };
 
-  const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDownCreate = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault(); // Ngăn chặn xuống dòng trong textarea
       handleCreateComment();
     }
   };
-  const [isCommentEditModalOpen, setCommentEditModalOpen] = useState(false);
-  const [commentText, setCommentText] = useState("");
 
-  const handleCommentEditClick = () => {
+  const handleCommentEditClick = (comment: IComment) => {
     setCommentEditModalOpen(true);
-  };
-
-  const handleCommentSaveClick = () => {
-    // Xử lý lưu thay đổi bình luận ở đây
-    // Sau khi lưu, đóng modal
-    setCommentEditModalOpen(false);
-  };
-  const [selectedComment, setSelectedComment] = useState(null);
-
-  const handleCommentDeleteClick = (comment: any) => {
     setSelectedComment(comment);
-    // Hiển thị thông báo hoặc thực hiện các bước khác nếu cần thiết
+    setCommentText(comment.comment);
   };
 
-  // Thêm hàm xử lý xác nhận xóa bình luận
-  const handleConfirmDeleteComment = () => {
-    // Thực hiện xóa bình luận trong trạng thái ứng dụng của bạn
-    // Sau đó, đặt lại selectedComment và ẩn thông báo hoặc thực hiện các bước khác nếu cần thiết
+  const handleKeyDownEdit = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleCommentUpdateClick();
+    }
+  };
+
+  const handleCommentUpdateClick = async () => {
+    event?.preventDefault();
+    commentBody.comment = commentText;
+    const res = await api.put(`/api/comments/${selectedComment?._id}`, commentBody);
+    setContentComment("");
+    if (res.status === 200) {
+      toast.success("Update comment successfully");
+      setCommentBody({
+        comment: "",
+        creatorId: userId,
+        postId: postId,
+      });
+    }
+    setCommentEditModalOpen(false);
+    handleReload();
+  };
+
+  const handleDeleteComment = async () => {
+    event?.preventDefault();
+    commentBody.comment = commentText;
+    const res = await api.delete(`/api/comments/${selectedComment?._id}`);
+    if (res.status === 200) {
+      toast.success("Delete comment successfully");
+    }
+    setCommentDeleteModalOpen(false);
+    handleReload();
+  };
+
+  const handleCommentDeleteClick = async (comment: IComment) => {
+    setCommentDeleteModalOpen(true);
+    setSelectedComment(comment);
+    setCommentText(comment.comment);
+  };
+
+  const handleConfirmDeleteComment = async () => {
+    await handleDeleteComment();
     setSelectedComment(null);
   };
 
-  // Thêm hàm xử lý hủy xóa bình luận
   const handleCancelDeleteComment = () => {
-    // Đặt lại selectedComment và ẩn thông báo hoặc thực hiện các bước khác nếu cần thiết
+    setCommentDeleteModalOpen(false);
     setSelectedComment(null);
   };
   return (
@@ -91,30 +124,6 @@ export const CommentComponent: React.FC<ICommentProps> = ({
                 />
               </div>
               <div className='we-comment'>
-                {/* Modal chỉnh sửa bình luận */}
-                {isCommentEditModalOpen && (
-                  <div className="edit-comment-modal">
-                    <h2>Chỉnh sửa bình luận</h2>
-                    <textarea
-                      value={commentText}
-                      onChange={(e) => setCommentText(e.target.value)}
-                      placeholder="Nhập nội dung bình luận..."
-                    ></textarea>
-                    <button
-                      className="save-update"
-                      onClick={handleCommentSaveClick}
-                    >
-                      Lưu
-                    </button>
-                    <button
-                      className="cancel-update"
-                      onClick={() => setCommentEditModalOpen(false)}
-                    >
-                      Hủy
-                    </button>
-                  </div>
-                )}
-                
                 <div className='coment-head'>
                   <h5>
                     <a
@@ -124,7 +133,7 @@ export const CommentComponent: React.FC<ICommentProps> = ({
                       {comment.name}
                     </a>
                   </h5>
-                  <span>{formatDateTime(comment.createdAt || '')}</span>
+                  <span>{formatDateTime(comment.createdAt || "")}</span>
                   <a
                     className='we-reply'
                     href='#'
@@ -132,34 +141,54 @@ export const CommentComponent: React.FC<ICommentProps> = ({
                   >
                     <i className='fa fa-reply'></i>
                   </a>
-                  <div className='dropdown' style={{ float: 'right', marginRight: '30px' }}>
-                  <a id='dropdownToggle'>
-                    <i className='fas fa-ellipsis-h'></i>
-                  </a>
                   <div
-                    className='dropdown-content'
-                    id='myDropdown'
+                    className='dropdown'
+                    style={{ float: "right", marginRight: "30px" }}
                   >
-                    <ul className="ul">
-                      <li>
-                        <a onClick={handleCommentEditClick}><i className="fas fa-pencil-alt"> Chỉnh sửa</i></a>
-                      </li>
-                      <li>
-                        <a onClick={() => handleCommentDeleteClick('Đây là một bình luận')}><i className="fas fa-trash-alt">  Xóa</i></a>
-                      </li>
-                    </ul>
+                    <a id='dropdownToggle'>
+                      <i className='fas fa-ellipsis-h'></i>
+                    </a>
+                    <div
+                      className='dropdown-content'
+                      id='myDropdown'
+                    >
+                      <ul className='ul'>
+                        <li>
+                          <a onClick={() => handleCommentEditClick(comment)}>
+                            <i className='fas fa-pencil-alt'> Chỉnh sửa</i>
+                          </a>
+                        </li>
+                        <li>
+                          <a onClick={() => handleCommentDeleteClick(comment)}>
+                            <i className='fas fa-trash-alt'> Xóa</i>
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
-                </div>
-                <p style={{maxWidth:'500px'}}>{comment.comment}</p>
-                {/* Modal xác nhận xóa bình luận */}
-                {selectedComment && (
-                  <div className="delete-comment-modal">
-                    <p>Bạn có chắc chắn muốn xóa bình luận này?</p>
-                    <button className="save-update" onClick={handleConfirmDeleteComment}>
-                      Xác nhận
+                {!isCommentEditModalOpen && <p>{comment.comment}</p>}
+
+                {/* Modal chỉnh sửa bình luận */}
+                {isCommentEditModalOpen && selectedComment?._id === comment._id && (
+                  <div className='edit-comment-modal'>
+                    <p>Chỉnh sửa bình luận</p>
+                    <textarea
+                      value={commentText}
+                      onChange={(e) => setCommentText(e.target.value)}
+                      onKeyDown={handleKeyDownEdit}
+                      placeholder='Nhập nội dung bình luận...'
+                    ></textarea>
+                    <button
+                      className='save-update'
+                      onClick={handleCommentUpdateClick}
+                    >
+                      Lưu
                     </button>
-                    <button className="cancel-update" onClick={handleCancelDeleteComment}>
+                    <button
+                      className='cancel-update'
+                      onClick={() => setCommentEditModalOpen(false)}
+                    >
                       Hủy
                     </button>
                   </div>
@@ -198,7 +227,7 @@ export const CommentComponent: React.FC<ICommentProps> = ({
               <textarea
                 className='import'
                 placeholder='Viết bình luận...'
-                onKeyDown={handleKeyDown}
+                onKeyDown={handleKeyDownCreate}
                 value={contentComment}
                 onChange={(e) => {
                   setContentComment(e.target.value);
@@ -214,6 +243,27 @@ export const CommentComponent: React.FC<ICommentProps> = ({
             </form>
           </div>
         </li>
+
+        {/* Modal xác nhận xóa bình luận */}
+        {isCommentDeleteModalOpen && (
+          <div className='confirmation-overlay'>
+            <div className='delete-comment-modal confirmation-modal'>
+              <p>Bạn có chắc chắn muốn xóa bình luận này?</p>
+              <button
+                className='save-update'
+                onClick={handleConfirmDeleteComment}
+              >
+                Xác nhận
+              </button>
+              <button
+                className='cancel-update'
+                onClick={handleCancelDeleteComment}
+              >
+                Hủy
+              </button>
+            </div>
+          </div>
+        )}
       </ul>
     </div>
   );

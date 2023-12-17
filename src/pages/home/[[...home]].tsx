@@ -16,6 +16,7 @@ export default function Page() {
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [listPost, setListPost] = useState<IPostRes[]>();
   const { user, isLoaded } = useUser();
+  const [reload, setReload] = useState(false);
   const [description, setDescription] = useState(
     "World's most beautiful car in Curabitur #test drive booking !",
   );
@@ -27,13 +28,26 @@ export default function Page() {
     setEditModalOpen(true);
   };
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const { data, isLoading, isError } = useQuery({ queryKey: ["POSTS"], queryFn: getAllPost });
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ["POSTS"],
+    queryFn: getAllPost,
+  });
+
+  useEffect(() => {
+    console.log("reload lai ");
+
+    refetch();
+  }, [reload, refetch]);
 
   useEffect(() => {
     if (!isLoading && !isError) {
       setListPost(data);
     }
   }, [isLoading, isError, data]);
+
+  const handleReload = () => {
+    setReload(!reload);
+  };
 
   const handleSaveClick = () => {
     // Xử lý lưu thay đổi ở đây
@@ -181,8 +195,8 @@ export default function Page() {
                   >
                     <div className='user-post'  style={{paddingTop:"10px"}}>
                       <div className='friend-info'>
-                        <Image 
-                          style={{marginLeft:"15px"}}
+                        <Image
+                          style={{ marginLeft: "15px" }}
                           height={200}
                           width={200}
                           src={post.avatarPath || ""}
@@ -198,7 +212,7 @@ export default function Page() {
                               {post.name}
                             </a>
                           </ins>
-                          <span>{formatDateTime(post.createdAt || '')}</span>
+                          <span>{formatDateTime(post.createdAt || "")}</span>
                         </div>
                         <div className='dropdown'>
                           <a id='dropdownToggle'>
@@ -285,7 +299,10 @@ export default function Page() {
                             </button>
                           </div>
                         )}
-                        <div className='description' style={{marginLeft:"15px"}}>
+                        <div
+                          className='description'
+                          style={{ marginLeft: "15px" }}
+                        >
                           <p>{post.content}</p>
                         </div>
                         <div className='post-meta'>
@@ -362,6 +379,7 @@ export default function Page() {
                         userCurrentImg={user?.imageUrl}
                         userId={user?.id}
                         postId={post._id}
+                        handleReload={handleReload}
                       />
                     )}
                   </div>

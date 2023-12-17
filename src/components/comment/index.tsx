@@ -32,6 +32,10 @@ export const CommentComponent: React.FC<ICommentProps> = ({
   });
 
   const handleCreateComment = async () => {
+    if (!commentBody.comment) {
+      toast.warning("You must provide a comment");
+      return;
+    }
     event?.preventDefault();
     const res = await api.post(`/api/comments`, commentBody);
     setContentComment("");
@@ -69,6 +73,10 @@ export const CommentComponent: React.FC<ICommentProps> = ({
   const handleCommentUpdateClick = async () => {
     event?.preventDefault();
     commentBody.comment = commentText;
+    if (!commentBody.comment) {
+      toast.warning("You must provide a comment");
+      return;
+    }
     const res = await api.put(`/api/comments/${selectedComment?._id}`, commentBody);
     setContentComment("");
     if (res.status === 200) {
@@ -121,51 +129,59 @@ export const CommentComponent: React.FC<ICommentProps> = ({
                   width={200}
                   src={comment.avatarPath || ""}
                   alt='Retail Admin'
+                  quality={100}
+                  priority
                 />
               </div>
               <div className='we-comment'>
                 <div className='coment-head'>
-                  <h5>
-                    <a
-                      href='time-line.html'
-                      title=''
-                    >
-                      {comment.name}
-                    </a>
-                  </h5>
-                  <span>{formatDateTime(comment.createdAt || "")}</span>
-                  <a
-                    className='we-reply'
-                    href='#'
-                    title='Reply'
-                  >
-                    <i className='fa fa-reply'></i>
-                  </a>
-                  <div
-                    className='dropdown'
-                    style={{ float: "right", marginRight: "30px" }}
-                  >
-                    <a id='dropdownToggle'>
-                      <i className='fas fa-ellipsis-h'></i>
-                    </a>
-                    <div
-                      className='dropdown-content'
-                      id='myDropdown'
-                    >
-                      <ul className='ul'>
-                        <li>
-                          <a onClick={() => handleCommentEditClick(comment)}>
-                            <i className='fas fa-pencil-alt'> Chỉnh sửa</i>
-                          </a>
-                        </li>
-                        <li>
-                          <a onClick={() => handleCommentDeleteClick(comment)}>
-                            <i className='fas fa-trash-alt'> Xóa</i>
-                          </a>
-                        </li>
-                      </ul>
+                  <div style={{display:'flex'}}>
+                    <div>
+                      <a
+                        style={{ marginRight: "10px" }}
+                        href='#'
+                        title=''
+                      >
+                        <b>{comment.name}</b>
+                      </a>
                     </div>
+                    <span>{formatDateTime(comment.createdAt || "")}</span>
+                    <a
+                      className='we-reply'
+                      href='#'
+                      title='Reply'
+                    >
+                      <i className='fa fa-reply'></i>
+                    </a>
                   </div>
+                  {comment.creatorId === userId && (
+                    <div
+                      className='dropdown'
+                      style={{ float: "right", marginRight: "30px" }}
+                    >
+                      <a id='dropdownToggle'>
+                        <i className='fas fa-ellipsis-h'></i>
+                      </a>
+
+                      <div
+                        className='dropdown-content'
+                        id='myDropdown'
+                      >
+                        <div className='ul'>
+                          <div>
+                            <a onClick={() => handleCommentEditClick(comment)}>
+                              <i className='fas fa-pencil-alt'> Chỉnh sửa</i>
+                            </a>
+                          </div>
+                          <div>
+                            <a onClick={() => handleCommentDeleteClick(comment)}>
+                              <i className='fas fa-trash-alt'> Xóa</i>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 {!isCommentEditModalOpen && <p>{comment.comment}</p>}
 

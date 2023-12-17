@@ -2,10 +2,11 @@ import { api } from "@/api/axios";
 import Image from "next/image";
 import React, { FormEvent, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
-
+import "react-toastify/dist/ReactToastify.css";
 export interface ICreatePostProps {
   imageUrl: string | undefined;
   currentUserId: string | undefined;
+  handleReload: () => void;
 }
 
 interface IPostForm {
@@ -17,18 +18,22 @@ interface IPostForm {
   numberComment: number;
 }
 
-const CreatePostForm: React.FC<ICreatePostProps> = ({ imageUrl, currentUserId }) => {
-  const [post, setPost] = useState<IPostForm>({
+const CreatePostForm: React.FC<ICreatePostProps> = ({ imageUrl, currentUserId, handleReload }) => {
+  const initPost = {
     content: "",
     images: "",
     creatorId: currentUserId || "",
     numberLike: 10,
     numberComment: 4,
-  });
+  };
+  const [post, setPost] = useState<IPostForm>(initPost);
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-
+    if (!post.content || !post.images) {
+      console.error("Ban chua nhap gi het de dang bai");
+      return;
+    }
     const formData = new FormData();
     formData.append("content", post.content);
     formData.append("images", post.images);
@@ -39,8 +44,10 @@ const CreatePostForm: React.FC<ICreatePostProps> = ({ imageUrl, currentUserId })
 
     try {
       const response = await api.post("/api/posts", formData);
-      if (response.status === 200) {
+      if (response.status === 201) {
         toast.success("Create post successfully!");
+        setPost(initPost);
+        handleReload();
       }
     } catch (error) {
       console.error("Error:", error);
@@ -49,13 +56,18 @@ const CreatePostForm: React.FC<ICreatePostProps> = ({ imageUrl, currentUserId })
 
   return (
     <div className='central-meta'>
-      <div className='new-postbox' style={{paddingTop:"10px"}}>
-        <Image        
-          style={{marginLeft:"15px"}}
-          height={200}
+      <div
+        className='new-postbox'
+        style={{ paddingTop: "10px" }}
+      >
+        <Image
+          style={{ marginLeft: "15px" }}
+          height={500}
           width={200}
           src={imageUrl || ""}
           alt=''
+          quality={100}
+          priority
         />
         <div className='newpst-input'>
           <form
@@ -64,11 +76,12 @@ const CreatePostForm: React.FC<ICreatePostProps> = ({ imageUrl, currentUserId })
           >
             <textarea
               placeholder='Bạn đang nghĩ gì?'
+              value={post.content}
               onChange={(e) => setPost({ ...post, content: e.target.value })}
             ></textarea>
-            <input
+            <input className="setPostImg"
               type='text'
-              placeholder='Enter link image'
+              value={post.images}
               onChange={(e) => setPost({ ...post, images: e.target.value })}
             ></input>
             <div className='attachments'>
@@ -94,7 +107,7 @@ const CreatePostForm: React.FC<ICreatePostProps> = ({ imageUrl, currentUserId })
                   <i className='fa fa-camera'></i>
                 </li>
                 <li>
-                  <button type='submit'>Đăng</button>
+                  <button className="submit" type='submit'>Đăng</button>
                 </li>
               </ul>
             </div>

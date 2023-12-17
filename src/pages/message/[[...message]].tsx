@@ -10,6 +10,8 @@ import { IChat, hostSocket } from "@/constant";
 import { Conversation } from "@/components/conversation";
 import { UserButton } from "@clerk/nextjs";
 import { formatDateTime } from "@/utils/utils";
+import { useQuery } from "@tanstack/react-query";
+import { IUser, getAllUser, getListFiendChat } from "@/api/message";
 
 export interface IFriendChat {
   _id: string;
@@ -33,41 +35,69 @@ export default function Page() {
   const [isReload, setIsReload] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [friendCurrent, setFriendCurrent] = useState<IFriendChat>();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [listUserMatch, setListUserMatch] = useState<IUser[] | null>([]);
   const { isLoaded, userId } = useAuth();
+
+  const { data } = useQuery({
+    queryKey: ["LIST_USER"],
+    queryFn: getAllUser,
+  });
 
   useEffect(() => {
     const socket = hostSocket && io(hostSocket, {});
     socket && setSocket(socket);
   }, []);
 
-  useEffect(() => {
-    const fetchListFriendChat = async () => {
-      if (userId) {
-        const response = await fetch(
-          `http://localhost:8000/api/messages/getChatListUser/${userId}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          },
-        );
-        const data = await response.json();
-        setListFriend(data.result);
+  // useEffect(() => {
+  //   const fetchListFriendChat = async () => {
+  //     if (userId) {
+  //       const response = await fetch(
+  //         `http://localhost:8000/api/messages/getChatListUser/${userId}`,
+  //         {
+  //           method: "GET",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //         },
+  //       );
+  //       const data = await response.json();
+  //       setListFriend(data.result);
 
-        if (data.result[0]) {
-          setFriendCurrent(data.result[0]);
+  //       if (data.result[0]) {
+  //         setFriendCurrent(data.result[0]);
+  //       }
+  //     }
+  //   };
+  //   fetchListFriendChat();
+  // }, [userId, isReload]);
+
+
+  const listFriendData = useQuery({
+    queryKey: ["LIST_FRIEND"],
+    queryFn: async () => {
+      const res = userId && (await getListFiendChat(userId));
+      if (res) {
+        setListFriend(res);
+        if (!friendCurrent) {
+          setFriendCurrent(res[0]);
         }
       }
-    };
-    fetchListFriendChat();
-  }, [userId, isReload]);
+      console.log("🚀 ~ file: [[...message]].tsx:79 ~ queryFn: ~ res:", res);
+      return res;
+    },
+  });
+
+  useEffect(() => {
+    console.log("reload lai ");
+
+    listFriendData.refetch();
+  }, [userId, isReload, listFriendData.data ]);
 
   useEffect(() => {
     const socket = hostSocket && io(hostSocket, {});
     if (socket) {
       socket.on("replyMessageRes", (data: IChat[]) => {
-        console.log("🚀 ~ file: [[...message]].tsx:67 ~ socket.on ~ data:", data);
         setConversation(data);
       });
       return () => {
@@ -99,13 +129,7 @@ export default function Page() {
     }
   };
 
-  useEffect(() => {
-    console.log("Conversation updated:", conversation);
-  }, [conversation]);
-
   const scrollToBottom = () => {
-    console.log("containerRef", containerRef);
-
     if (containerRef.current) {
       // containerRef.current.scrollTop = containerRef.current.scrollHeight
       containerRef.current.scrollTo({
@@ -113,7 +137,6 @@ export default function Page() {
         top: containerRef.current.scrollHeight,
         behavior: "smooth",
       });
-      console.log("containerRef.current.scrollHeight", containerRef.current.scrollHeight);
     }
   };
 
@@ -125,6 +148,12 @@ export default function Page() {
     return null;
   }
 
+  const handleSearch = () => {
+    const listUser =
+      data && data.filter((item) => item.fullName.toLowerCase().includes(searchTerm.toLowerCase()));
+    setListUserMatch(listUser || []);
+  };
+
   return (
     <div className='layout'>
       <div className='fixed-top'>
@@ -134,6 +163,15 @@ export default function Page() {
         />
         <div className='page-title'>
           <div className='row'>
+          <Image
+              style={{ height: "40px", width: "170px" }}
+              height={40}
+              width={170}
+              src='/logo.jpg'
+              alt='logo'
+              quality={100}
+              priority
+            />
             <h4>Chat Web App</h4>
             <UserButton afterSignOutUrl='/sign-in' />
           </div>
@@ -193,6 +231,11 @@ export default function Page() {
                     type='search'
                     id='search'
                     placeholder='Search or star new chat'
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      handleSearch();
+                    }}
+                    onBlur={()=> {setIsReload(!isReload)}}
                   />
                 </div>
               </div>
@@ -204,33 +247,69 @@ export default function Page() {
 
               {/* Left slide */}
               <ul className='users'>
-                {listFriend.map((item) => (
-                  <li
-                    className='person active-user'
-                    data-chat='person1'
-                    key={item._id}
-                    onClick={() => {
-                      setFriendCurrent(item);
-                    }}
-                  >
-                    <div className='user'>
-                      <Image
-                        height={200}
-                        width={200}
-                        src={item.avatarPath} // Use the avatarPath from the item
-                        alt={item.name}
-                      />
-                      <span className='status online'></span>
-                    </div>
-                    <div className='group-name-time'>
-                      <div className='name-time'>
-                        <p className='name'>{item.name}</p>
-                        <p className='time'>{formatDateTime(item.createdAt || "")}</p>
-                      </div>
-                      <p className='content'>{item.lastedMessage}</p>
-                    </div>
-                  </li>
-                ))}
+                {searchTerm === ""
+                  ? listFriend.map((item) => (
+                      <li
+                        className='person active-user'
+                        data-chat='person1'
+                        key={item._id}
+                        onClick={() => {
+                          setFriendCurrent(item);
+                        }}
+                      >
+                        <div className='user'>
+                          <Image
+                            height={200}
+                            width={200}
+                            src={item.avatarPath} // Use the avatarPath from the item
+                            alt={item.name}
+                          />
+                          <span className='status online'></span>
+                        </div>
+                        <div className='group-name-time'>
+                          <div className='name-time'>
+                            <p className='name'>{item.name}</p>
+                            <p className='time'>{formatDateTime(item.createdAt || "")}</p>
+                          </div>
+                          <p className='content'>{item.lastedMessage}</p>
+                        </div>
+                      </li>
+                    ))
+                  : listUserMatch &&
+                    listUserMatch.map((item) => (
+                      <li
+                        className='person active-user'
+                        data-chat='person1'
+                        key={item.id}
+                        onClick={() => {
+                          console.log("item", item);
+                          setFriendCurrent({
+                            _id: item.id,
+                            otherUserId: item.id,
+                            currentUserId: userId,
+                            createdAt: item.createdAt,
+                            lastedMessage: "",
+                            avatarPath: item.imageUrl,
+                            name: item.fullName,
+                          });
+                        }}
+                      >
+                        <div className='user'>
+                          <Image
+                            height={200}
+                            width={200}
+                            src={item.imageUrl}
+                            alt={item.fullName}
+                          />
+                          <span className='status online'></span>
+                        </div>
+                        <div className='group-name-time'>
+                          <div className='name-time'>
+                            <p className='name'>{item.fullName}</p>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
               </ul>
             </div>
           </div>
@@ -284,6 +363,7 @@ export default function Page() {
             <Conversation
               conversation={conversation}
               userId={userId}
+              friendId={friendCurrent?.otherUserId}
               senderAvatar={friendCurrent?.avatarPath || ""}
               name={friendCurrent?.name || ""}
             />

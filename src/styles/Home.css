@@ -1851,7 +1851,7 @@ for some reason nth-child(1) is always busy and elements starting from 2 */
     border: 1px solid #ede9e9;
     display: table-cell;
     margin-left: 20px;
-    padding: 10px;
+        padding: 10px;
     border-radius: 15px;
     vertical-align: top;
     position: relative;

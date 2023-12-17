@@ -81,7 +81,6 @@ const CreatePostForm: React.FC<ICreatePostProps> = ({ imageUrl, currentUserId, h
             ></textarea>
             <input className="setPostImg"
               type='text'
-              placeholder='Enter link image'
               value={post.images}
               onChange={(e) => setPost({ ...post, images: e.target.value })}
             ></input>

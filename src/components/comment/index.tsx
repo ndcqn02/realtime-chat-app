@@ -135,23 +135,25 @@ export const CommentComponent: React.FC<ICommentProps> = ({
               </div>
               <div className='we-comment'>
                 <div className='coment-head'>
-                  <div>
+                  <div style={{display:'flex'}}>
+                    <div>
+                      <a
+                        style={{ marginRight: "10px" }}
+                        href='#'
+                        title=''
+                      >
+                        <b>{comment.name}</b>
+                      </a>
+                    </div>
+                    <span>{formatDateTime(comment.createdAt || "")}</span>
                     <a
-                      style={{ marginRight: "10px" }}
+                      className='we-reply'
                       href='#'
-                      title=''
+                      title='Reply'
                     >
-                      <b>{comment.name}</b>
+                      <i className='fa fa-reply'></i>
                     </a>
                   </div>
-                  <span>{formatDateTime(comment.createdAt || "")}</span>
-                  <a
-                    className='we-reply'
-                    href='#'
-                    title='Reply'
-                  >
-                    <i className='fa fa-reply'></i>
-                  </a>
                   {comment.creatorId === userId && (
                     <div
                       className='dropdown'
@@ -165,18 +167,18 @@ export const CommentComponent: React.FC<ICommentProps> = ({
                         className='dropdown-content'
                         id='myDropdown'
                       >
-                        <ul className='ul'>
-                          <li>
+                        <div className='ul'>
+                          <div>
                             <a onClick={() => handleCommentEditClick(comment)}>
                               <i className='fas fa-pencil-alt'> Chỉnh sửa</i>
                             </a>
-                          </li>
-                          <li>
+                          </div>
+                          <div>
                             <a onClick={() => handleCommentDeleteClick(comment)}>
                               <i className='fas fa-trash-alt'> Xóa</i>
                             </a>
-                          </li>
-                        </ul>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}

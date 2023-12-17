@@ -7,6 +7,7 @@ import { formatDateTime } from "@/utils/utils";
 interface IConversationProps {
   conversation: IChat[];
   userId: string;
+  friendId: string | undefined;
   name: string;
   senderAvatar: string;
 }
@@ -14,13 +15,13 @@ interface IConversationProps {
 export const Conversation: React.FC<IConversationProps> = ({
   conversation,
   userId,
+  friendId,
   senderAvatar,
   name,
 }) => {
   const chatBoxRef = useRef<HTMLUListElement>(null);
 
   useEffect(() => {
-    // Scroll to the bottom when conversation changes
     if (chatBoxRef.current) {
       chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
     }
@@ -45,11 +46,22 @@ export const Conversation: React.FC<IConversationProps> = ({
     console.log("Delete message:", selectedMessage);
     setShowDropdown(false);
   };
+  const checkMessage = conversation.find(
+    (item) =>
+      (item.senderId === friendId || item.recipientId === friendId) &&
+      (item.senderId === userId || item.recipientId === userId),
+  );
+  console.log("🚀 ~ file: index.tsx:31 ~ checkMessage:", checkMessage);
+
   return (
     <div className='chat-container'>
-      <ul className='chat-box chatContainerScroll' ref={chatBoxRef}>
+      <ul
+        className='chat-box chatContainerScroll'
+        ref={chatBoxRef}
+      >
         {Array.isArray(conversation) &&
           conversation.length > 0 &&
+          checkMessage &&
           conversation.map((message) =>
             message.senderId === userId ? (
               <li key={message.createdAt} className='chat-right'>
@@ -67,7 +79,7 @@ export const Conversation: React.FC<IConversationProps> = ({
                   )}
                 </div>
                 <div className='chat-hour'>
-                  {formatDateTime(message.createdAt || '')}
+                  {formatDateTime(message.createdAt || "")}
                   <span className='fa fa-check-circle'></span>
                 </div>
                 <div className='chat-text-right'>
@@ -75,38 +87,30 @@ export const Conversation: React.FC<IConversationProps> = ({
                 </div>
               </li>
             ) : (
-              <li key={message.createdAt} className='chat-left'>
-                <div className='chat-avatar'>
-                  <Image
-                    height={100}
-                    width={100}
-                    src={senderAvatar}
-                    alt={name}
-                    quality={100}
-                    priority
-                  />
-                </div>
-                <div className='chat-text-left'>
-                  <p> {message.message}</p>
-                </div>
-                <div className='chat-hour'>
-                  {formatDateTime(message.createdAt || '')}
-                  <span className='fa fa-check-circle'></span>
-                </div>
-                <div className='ellipsis-container' style={{ margin: '10px' }}>
-                  <a
-                    id='dropdownToggle'
-                    onClick={() => handleEllipsisClick(message)}
-                  >
-                    <i className='fas fa-ellipsis-h'></i>
-                  </a>
-                  {showDropdown && selectedMessage === message && (
-                    <div className='dropdown-menu'>
-                      <div onClick={handleDelete}><i className='fas fa-trash-alt' style={{ color: 'red' }}> Xóa</i></div>
-                    </div>
-                  )}
-                </div>
-              </li>
+              friendId === message.senderId && (
+                <li
+                  key={message.createdAt}
+                  className='chat-left'
+                >
+                  <div className='chat-avatar'>
+                    <Image
+                      height={100}
+                      width={100}
+                      src={senderAvatar}
+                      alt={name}
+                      quality={100}
+                      priority
+                    />
+                  </div>
+                  <div className='chat-text-left'>
+                    <p> {message.message}</p>
+                  </div>
+                  <div className='chat-hour'>
+                    {formatDateTime(message.createdAt || "")}
+                    <span className='fa fa-check-circle'></span>
+                  </div>
+                </li>
+              )
             ),
           )}
       </ul>

@@ -33,6 +33,7 @@ export default function Page() {
   const [listFriend, setListFriend] = useState<IFriendChat[]>([]);
   const [socket, setSocket] = useState<Socket>();
   const [isReload, setIsReload] = useState<boolean>(false);
+  const [reLoadDelete, setReLoadDelete] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [friendCurrent, setFriendCurrent] = useState<IFriendChat>();
   const [searchTerm, setSearchTerm] = useState("");
@@ -49,29 +50,6 @@ export default function Page() {
     socket && setSocket(socket);
   }, []);
 
-  // useEffect(() => {
-  //   const fetchListFriendChat = async () => {
-  //     if (userId) {
-  //       const response = await fetch(
-  //         `http://localhost:8000/api/messages/getChatListUser/${userId}`,
-  //         {
-  //           method: "GET",
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //           },
-  //         },
-  //       );
-  //       const data = await response.json();
-  //       setListFriend(data.result);
-
-  //       if (data.result[0]) {
-  //         setFriendCurrent(data.result[0]);
-  //       }
-  //     }
-  //   };
-  //   fetchListFriendChat();
-  // }, [userId, isReload]);
-
 
   const listFriendData = useQuery({
     queryKey: ["LIST_FRIEND"],
@@ -83,7 +61,6 @@ export default function Page() {
           setFriendCurrent(res[0]);
         }
       }
-      console.log("🚀 ~ file: [[...message]].tsx:79 ~ queryFn: ~ res:", res);
       return res;
     },
   });
@@ -115,7 +92,7 @@ export default function Page() {
     } else {
       console.error(`Has not friendCurrent: ${friendCurrent} or socket: ${socket}`);
     }
-  }, [friendCurrent]);
+  }, [friendCurrent, reLoadDelete]);
 
   const getMessage = async (socket: Socket, senderId: string, recipientId: string) => {
     try {
@@ -123,6 +100,8 @@ export default function Page() {
         recipientId: recipientId,
         senderId: senderId,
       };
+      console.log("emit call io");
+      
       socket.emit("getMessage", payload);
     } catch (error) {
       console.error("Error connect:", error);
@@ -131,7 +110,6 @@ export default function Page() {
 
   const scrollToBottom = () => {
     if (containerRef.current) {
-      // containerRef.current.scrollTop = containerRef.current.scrollHeight
       containerRef.current.scrollTo({
         left: 0,
         top: containerRef.current.scrollHeight,
@@ -366,6 +344,7 @@ export default function Page() {
               friendId={friendCurrent?.otherUserId}
               senderAvatar={friendCurrent?.avatarPath || ""}
               name={friendCurrent?.name || ""}
+              handleReload={()=> setReLoadDelete(!reLoadDelete)}
             />
             <ChatForm
               senderId={userId}

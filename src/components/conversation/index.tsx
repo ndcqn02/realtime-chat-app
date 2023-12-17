@@ -3,6 +3,7 @@ import { IChat } from "@/constant";
 import Image from "next/image";
 import "@/styles/Message.css";
 import { formatDateTime } from "@/utils/utils";
+import { api } from "@/api/axios";
 
 interface IConversationProps {
   conversation: IChat[];
@@ -10,6 +11,7 @@ interface IConversationProps {
   friendId: string | undefined;
   name: string;
   senderAvatar: string;
+  handleReload: () => void;
 }
 
 export const Conversation: React.FC<IConversationProps> = ({
@@ -18,6 +20,7 @@ export const Conversation: React.FC<IConversationProps> = ({
   friendId,
   senderAvatar,
   name,
+  handleReload,
 }) => {
   const chatBoxRef = useRef<HTMLUListElement>(null);
 
@@ -41,9 +44,12 @@ export const Conversation: React.FC<IConversationProps> = ({
     setShowDropdown(true);
   };
 
-  const handleDelete = () => {
-    // Logic xử lý khi click vào tùy chọn xóa
-    console.log("Delete message:", selectedMessage);
+  const handleDelete = async () => {
+    const res = await api.delete(`/api/messages/${selectedMessage?._id}`);
+    if (res.status === 200) {
+      handleReload();
+    }
+    setSelectedMessage(null);
     setShowDropdown(false);
   };
   const checkMessage = conversation.find(
@@ -51,8 +57,6 @@ export const Conversation: React.FC<IConversationProps> = ({
       (item.senderId === friendId || item.recipientId === friendId) &&
       (item.senderId === userId || item.recipientId === userId),
   );
-  console.log("🚀 ~ file: index.tsx:31 ~ checkMessage:", checkMessage);
-
   return (
     <div className='chat-container'>
       <ul
@@ -64,8 +68,14 @@ export const Conversation: React.FC<IConversationProps> = ({
           checkMessage &&
           conversation.map((message) =>
             message.senderId === userId ? (
-              <li key={message.createdAt} className='chat-right'>
-                <div className='ellipsis-container' style={{ margin: '10px' }}>
+              <li
+                key={message.createdAt}
+                className='chat-right'
+              >
+                <div
+                  className='ellipsis-container'
+                  style={{ margin: "10px" }}
+                >
                   <a
                     id='dropdownToggle'
                     onClick={() => handleEllipsisClick(message)}
@@ -74,7 +84,15 @@ export const Conversation: React.FC<IConversationProps> = ({
                   </a>
                   {showDropdown && selectedMessage === message && (
                     <div className='dropdown-menu'>
-                      <div onClick={handleDelete}><i className='fas fa-trash-alt' style={{ color: 'red' }}> Xóa</i></div>
+                      <div onClick={handleDelete}>
+                        <i
+                          className='fas fa-trash-alt'
+                          style={{ color: "red" }}
+                        >
+                          {" "}
+                          Xóa
+                        </i>
+                      </div>
                     </div>
                   )}
                 </div>

@@ -10,6 +10,7 @@ import { IPostRes, getAllPost } from "@/api/post";
 import CreatePostForm from "@/components/createPostForm";
 import { CommentComponent } from "@/components/comment";
 import { ToastContainer } from "react-toastify";
+import { formatDateTime } from "@/utils/utils";
 
 export default function Page() {
   const [isEditModalOpen, setEditModalOpen] = useState(false);
@@ -179,7 +180,8 @@ export default function Page() {
                   >
                     <div className='user-post'>
                       <div className='friend-info'>
-                        <Image
+                        <Image 
+                          style={{marginLeft:"15px"}}
                           height={200}
                           width={200}
                           src={post.avatarPath || ""}
@@ -195,7 +197,7 @@ export default function Page() {
                               {post.name}
                             </a>
                           </ins>
-                          <span>{post.createdAt}</span>
+                          <span>{formatDateTime(post.createdAt || '')}</span>
                         </div>
                         <div className='dropdown'>
                           <a id='dropdownToggle'>
@@ -282,7 +284,7 @@ export default function Page() {
                             </button>
                           </div>
                         )}
-                        <div className='description'>
+                        <div className='description' style={{marginLeft:"15px"}}>
                           <p>{post.content}</p>
                         </div>
                         <div className='post-meta'>

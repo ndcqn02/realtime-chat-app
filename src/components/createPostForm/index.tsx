@@ -50,7 +50,8 @@ const CreatePostForm: React.FC<ICreatePostProps> = ({ imageUrl, currentUserId })
   return (
     <div className='central-meta'>
       <div className='new-postbox'>
-        <Image
+        <Image        
+          style={{marginLeft:"15px"}}
           height={200}
           width={200}
           src={imageUrl || ""}

@@ -32,6 +32,10 @@ export const CommentComponent: React.FC<ICommentProps> = ({
   });
 
   const handleCreateComment = async () => {
+    if (!commentBody.comment) {
+      toast.warning("You must provide a comment");
+      return;
+    }
     event?.preventDefault();
     const res = await api.post(`/api/comments`, commentBody);
     setContentComment("");
@@ -69,6 +73,10 @@ export const CommentComponent: React.FC<ICommentProps> = ({
   const handleCommentUpdateClick = async () => {
     event?.preventDefault();
     commentBody.comment = commentText;
+    if (!commentBody.comment) {
+      toast.warning("You must provide a comment");
+      return;
+    }
     const res = await api.put(`/api/comments/${selectedComment?._id}`, commentBody);
     setContentComment("");
     if (res.status === 200) {
@@ -129,7 +137,7 @@ export const CommentComponent: React.FC<ICommentProps> = ({
                 <div className='coment-head'>
                   <div>
                     <a
-                      style={{ marginRight: '10px' }}
+                      style={{ marginRight: "10px" }}
                       href='#'
                       title=''
                     >

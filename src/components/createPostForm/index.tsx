@@ -66,9 +66,8 @@ const CreatePostForm: React.FC<ICreatePostProps> = ({ imageUrl, currentUserId })
               placeholder='Bạn đang nghĩ gì?'
               onChange={(e) => setPost({ ...post, content: e.target.value })}
             ></textarea>
-            <input
+            <input className="setPostImg"
               type='text'
-              placeholder='Enter link image'
               onChange={(e) => setPost({ ...post, images: e.target.value })}
             ></input>
             <div className='attachments'>
@@ -94,7 +93,7 @@ const CreatePostForm: React.FC<ICreatePostProps> = ({ imageUrl, currentUserId })
                   <i className='fa fa-camera'></i>
                 </li>
                 <li>
-                  <button type='submit'>Đăng</button>
+                  <button className="submit" type='submit'>Đăng</button>
                 </li>
               </ul>
             </div>

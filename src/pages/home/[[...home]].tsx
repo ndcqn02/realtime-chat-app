@@ -16,6 +16,7 @@ export default function Page() {
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [listPost, setListPost] = useState<IPostRes[]>();
   const { user, isLoaded } = useUser();
+  const [reload, setReload] = useState(false);
   const [description, setDescription] = useState(
     "World's most beautiful car in Curabitur #test drive booking !",
   );
@@ -27,13 +28,26 @@ export default function Page() {
     setEditModalOpen(true);
   };
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const { data, isLoading, isError } = useQuery({ queryKey: ["POSTS"], queryFn: getAllPost });
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ["POSTS"],
+    queryFn: getAllPost,
+  });
+
+  useEffect(() => {
+    console.log("reload lai ");
+
+    refetch();
+  }, [reload, refetch]);
 
   useEffect(() => {
     if (!isLoading && !isError) {
       setListPost(data);
     }
   }, [isLoading, isError, data]);
+
+  const handleReload = () => {
+    setReload(!reload);
+  };
 
   const handleSaveClick = () => {
     // Xử lý lưu thay đổi ở đây
@@ -79,13 +93,14 @@ export default function Page() {
         />
         <div className='page-title'>
           <div className='row'>
+            <img src="./image/logo_chat.jpg" alt="" />
             <h4>Chat Web App</h4>
             <UserButton afterSignOutUrl='/' />
           </div>
         </div>
         <div className='top-bar'>
           <div className='navbar'>
-            <a href='home'>
+          <a href='home' style={{ color: '#00fe2a'}}>
               <i className='fas fa-home'></i>
             </a>
             <a href='message'>
@@ -171,17 +186,17 @@ export default function Page() {
               currentUserId={user?.id}
             />
 
-            <div className='loadMore'>
+            <div className='loadMore' >
               {listPost?.map((post) => {
                 return (
                   <div
                     key={post._id}
                     className='central-meta item'
                   >
-                    <div className='user-post'>
+                    <div className='user-post'  style={{paddingTop:"10px"}}>
                       <div className='friend-info'>
-                        <Image 
-                          style={{marginLeft:"15px"}}
+                        <Image
+                          style={{ marginLeft: "15px" }}
                           height={200}
                           width={200}
                           src={post.avatarPath || ""}
@@ -197,7 +212,7 @@ export default function Page() {
                               {post.name}
                             </a>
                           </ins>
-                          <span>{formatDateTime(post.createdAt || '')}</span>
+                          <span>{formatDateTime(post.createdAt || "")}</span>
                         </div>
                         <div className='dropdown'>
                           <a id='dropdownToggle'>
@@ -231,7 +246,7 @@ export default function Page() {
                               placeholder='Nhập mô tả bài viết...'
                             ></textarea>
                             <div className='post-meta'>
-                              <Image
+                              <Image 
                                 height={500}
                                 width={500}
                                 className='m-r-20'
@@ -284,7 +299,10 @@ export default function Page() {
                             </button>
                           </div>
                         )}
-                        <div className='description' style={{marginLeft:"15px"}}>
+                        <div
+                          className='description'
+                          style={{ marginLeft: "15px" }}
+                        >
                           <p>{post.content}</p>
                         </div>
                         <div className='post-meta'>
@@ -332,8 +350,6 @@ export default function Page() {
                       </div>
                     </div>
                     <div className='like-comment-share'>
-                      <ul>
-                        <li>
                           <span
                             className='like'
                             title='dislike'
@@ -341,8 +357,6 @@ export default function Page() {
                             <i className='fas fa-heart'></i>
                             Like
                           </span>
-                        </li>
-                        <li>
                           <span
                             className='like'
                             title='dislike'
@@ -350,8 +364,6 @@ export default function Page() {
                             <i className='far fa-comment'></i>
                             Comments
                           </span>
-                        </li>
-                        <li>
                           <span
                             className='like'
                             title='dislike'
@@ -359,8 +371,6 @@ export default function Page() {
                             <i className='fas fa-share-alt'></i>
                             Share
                           </span>
-                        </li>
-                      </ul>
                     </div>
                     {/* comment */}
                     {post?.comments && (
@@ -369,6 +379,7 @@ export default function Page() {
                         userCurrentImg={user?.imageUrl}
                         userId={user?.id}
                         postId={post._id}
+                        handleReload={handleReload}
                       />
                     )}
                   </div>

@@ -257,7 +257,9 @@ img {
   justify-content: center;
   align-items: center;
   display: flex;
-  background-color: transparent;
+  margin-top: 10px;
+  background-color: #ffffff;
+  border: none;
   height: 8vh;
 }
 .navbar {

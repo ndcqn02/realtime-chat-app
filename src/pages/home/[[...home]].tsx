@@ -385,7 +385,7 @@ export default function Page() {
                       <div
                         className='confirmation-overlay'
                         style={{
-                          backgroundColor: "rgba(0, 0, 0, 0.3)",
+                          backgroundColor: "rgba(0, 0, 0, 0.1)",
                           display: "block !important",
                         }}
                       >

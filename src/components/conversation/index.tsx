@@ -50,6 +50,8 @@ export const Conversation: React.FC<IConversationProps> = ({
                     width={100}
                     src={senderAvatar}
                     alt={name}
+                    quality={100}
+                    priority
                   />
                 </div>
                 <div className='chat-text-left'>

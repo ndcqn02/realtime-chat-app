@@ -9,22 +9,46 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { IPostRes, getAllPost } from "@/api/post";
 import CreatePostForm from "@/components/createPostForm";
 import { CommentComponent } from "@/components/comment";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { formatDateTime } from "@/utils/utils";
+import LeftBar from "@/components/leftBar/leftBar";
+import { api } from "@/api/axios";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Page() {
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [listPost, setListPost] = useState<IPostRes[]>();
   const { user, isLoaded } = useUser();
   const [reload, setReload] = useState(false);
-  const [description, setDescription] = useState(
-    "World's most beautiful car in Curabitur #test drive booking !",
-  );
+  const [postSelected, setPostSelected] = useState<IPostRes | null>(null);
+  const [description, setDescription] = useState("");
+  const [linkPost, setLinkPost] = useState("");
+
+  const initPostBody = {
+    content: "",
+    images: "",
+    creatorId: user?.id || "",
+    numberLike: 10,
+    numberComment: 4,
+  };
+  const [postBody, setPostBody] = useState(initPostBody);
+
   const [imageUrl, setImageUrl] = useState(
     "https://cdn.sforum.vn/sforum/wp-content/uploads/2023/06/tai-hinh-nen-dep-nhat-the-gioi-57.jpg",
   );
   setEditModalOpen;
-  const handleEditClick = () => {
+  const handleEditClick = (post: IPostRes) => {
+    setPostSelected(post);
+    setPostBody({
+      ...postBody,
+      content: post.content,
+      images: post.images,
+      creatorId: post.creatorId,
+      numberLike: post.numberLike,
+      numberComment: post.numberComment,
+    });
+    setDescription(post.content);
+    setLinkPost(post.images);
     setEditModalOpen(true);
   };
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -49,14 +73,32 @@ export default function Page() {
     setReload(!reload);
   };
 
-  const handleSaveClick = () => {
-    // Xử lý lưu thay đổi ở đây
-    // Sau khi lưu, đóng modal
+  const handleDeleteClick = (post: IPostRes) => {
+    setPostSelected(post);
+    setDeleteModalOpen(true);
+  };
+
+  const handleEditPost = async () => {
+    event?.preventDefault();
+    const res = await api.put(`/api/posts/${postSelected?._id}`, postBody);
+
+    if (res.status === 200) {
+      toast.success("Update post successfully");
+      setPostBody(initPostBody);
+    }
+    setEditModalOpen(false);
+    setPostSelected(null);
+    handleReload();
+  };
+
+  const handleSaveClick = async () => {
+    await handleEditPost();
+    setReload(!reload);
     setEditModalOpen(false);
   };
 
   const handleCancelClick = () => {
-    // Đóng modal mà không lưu thay đổi
+    setPostBody(initPostBody);
     setEditModalOpen(false);
   };
 
@@ -68,16 +110,21 @@ export default function Page() {
       setImageUrl(newImageUrl);
     }
   };
-  const openDeleteModal = () => {
-    setDeleteModalOpen(true);
-  };
 
   const closeDeleteModal = () => {
+    setPostSelected(null);
     setDeleteModalOpen(false);
   };
-  const handleDeletePost = () => {
-    // Thực hiện xóa bài viết ở đây
-    // Sau khi xóa, đóng modal
+
+  const handleDeletePost = async () => {
+    const res = await api.delete(`/api/posts/${postSelected?._id}`);
+
+    if (res.status === 200) {
+      toast.success("Delete post successfully");
+      setPostBody(initPostBody);
+    }
+    setEditModalOpen(false);
+    handleReload();
     closeDeleteModal();
   };
 
@@ -93,14 +140,25 @@ export default function Page() {
         />
         <div className='page-title'>
           <div className='row'>
-            <img src="./image/logo_chat.jpg" alt="" />
+            <Image
+              style={{ height: "40px", width: "170px" }}
+              height={40}
+              width={170}
+              src='/logo.jpg'
+              alt='logo'
+              quality={100}
+              priority
+            />
             <h4>Chat Web App</h4>
             <UserButton afterSignOutUrl='/' />
           </div>
         </div>
         <div className='top-bar'>
           <div className='navbar'>
-          <a href='home' style={{ color: '#00fe2a'}}>
+            <a
+              href='home'
+              style={{ color: "#00fe2a" }}
+            >
               <i className='fas fa-home'></i>
             </a>
             <a href='message'>
@@ -118,95 +176,41 @@ export default function Page() {
       <div style={{ height: "16vh" }}></div>
 
       <div className='layout-main-home'>
-        <div className='layout-left-home'>
-          <div className='nav-bar'>
-            <ul className='nav'>
-              <li>
-                <i className='fas fa-newspaper'></i>
-                <a
-                  href='home'
-                  title=''
-                >
-                  Trang chủ
-                </a>
-              </li>
-              <li>
-                <i className='fas fa-users'></i>
-                <a
-                  href=''
-                  title=''
-                >
-                  Nhóm
-                </a>
-              </li>
-              <li>
-                <i className='fas fa-user'></i>
-                <a
-                  href=''
-                  title=''
-                >
-                  Bạn bè
-                </a>
-              </li>
-              <li>
-                <i className='fas fa-image'></i>
-                <a
-                  href=''
-                  title=''
-                >
-                  Hình ảnh
-                </a>
-              </li>
-              <li>
-                <i className='fas fa-video'></i>
-                <a
-                  href=''
-                  title=''
-                >
-                  Video
-                </a>
-              </li>
-
-              <li>
-                <i className='fas fa-gamepad'></i>
-                <a
-                  href=''
-                  title=''
-                >
-                  Chơi game
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
+        <LeftBar />
         <div className='layout-center-home'>
           <div className='col-lg-6'>
             <CreatePostForm
               imageUrl={user?.imageUrl}
               currentUserId={user?.id}
+              handleReload={handleReload}
             />
 
-            <div className='loadMore' >
+            <div className='loadMore'>
               {listPost?.map((post) => {
                 return (
                   <div
                     key={post._id}
                     className='central-meta item'
                   >
-                    <div className='user-post'  style={{paddingTop:"10px"}}>
+                    <div
+                      className='user-post'
+                      style={{ paddingTop: "10px" }}
+                    >
                       <div className='friend-info'>
                         <Image
                           style={{ marginLeft: "15px" }}
-                          height={200}
-                          width={200}
+                          height={700}
+                          width={500}
                           src={post.avatarPath || ""}
                           alt='Retail Admin'
+                          quality={100}
+                          priority
                         />
 
                         <div className='friend-name'>
                           <ins>
                             <a
-                              href='time-line.html'
+                              href='#'
                               title=''
                             >
                               {post.name}
@@ -214,43 +218,52 @@ export default function Page() {
                           </ins>
                           <span>{formatDateTime(post.createdAt || "")}</span>
                         </div>
-                        <div className='dropdown'>
-                          <a id='dropdownToggle'>
-                            <i className='fas fa-ellipsis-h'></i>
-                          </a>
-                          <div
-                            className='dropdown-content'
-                            id='myDropdown'
-                          >
-                            <ul className='ul'>
-                              <li>
-                                <a onClick={handleEditClick}>
-                                  <i className='fas fa-pencil-alt'> Chỉnh sửa</i>
-                                </a>
-                              </li>
-                              <li>
-                                <a onClick={openDeleteModal}>
-                                  <i className='fas fa-trash-alt'> Xóa</i>
-                                </a>
-                              </li>
-                            </ul>
+                        {post.creatorId === user?.id && (
+                          <div className='dropdown'>
+                            <a id='dropdownToggle'>
+                              <i className='fas fa-ellipsis-h'></i>
+                            </a>
+
+                            <div
+                              className='dropdown-content'
+                              id='myDropdown'
+                            >
+                              <ul className='ul'>
+                                <li>
+                                  <a onClick={() => handleEditClick(post)}>
+                                    <i className='fas fa-pencil-alt'> Chỉnh sửa</i>
+                                  </a>
+                                </li>
+                                <li>
+                                  <a onClick={() => handleDeleteClick(post)}>
+                                    <i className='fas fa-trash-alt'> Xóa</i>
+                                  </a>
+                                </li>
+                              </ul>
+                            </div>
                           </div>
-                        </div>
+                        )}
+
                         {/* Modal chỉnh sửa */}
-                        {isEditModalOpen && (
+                        {isEditModalOpen && postSelected?._id === post._id && (
                           <div className='edit-modal'>
                             <h2>Chỉnh sửa bài viết</h2>
                             <textarea
                               value={description}
-                              onChange={(e) => setDescription(e.target.value)}
+                              onChange={(e) => {
+                                setDescription(e.target.value);
+                                setPostBody({ ...postBody, content: e.target.value });
+                              }}
                               placeholder='Nhập mô tả bài viết...'
                             ></textarea>
                             <div className='post-meta'>
-                              <Image 
+                              <Image
                                 height={500}
                                 width={500}
                                 className='m-r-20'
-                                src={imageUrl}
+                                src={post.images}
+                                quality={100}
+                                priority
                                 alt='Bài viết'
                               />
                               <i
@@ -260,6 +273,15 @@ export default function Page() {
                               <div className='image-controls'>
                                 <label htmlFor='imageInput'>Chọn ảnh mới</label>
                                 <br />
+                                <input
+                                  alt='Link update image post'
+                                  type='text'
+                                  value={linkPost}
+                                  onChange={(e) => {
+                                    setLinkPost(e.target.value);
+                                    setPostBody({ ...postBody, images: e.target.value });
+                                  }}
+                                />
                                 <input
                                   id='imageInput'
                                   type='file'
@@ -281,24 +303,7 @@ export default function Page() {
                             </button>
                           </div>
                         )}
-                        {/* Modal xóa bài viết */}
-                        {isDeleteModalOpen && (
-                          <div className='delete-modal'>
-                            <p>Bạn có chắc chắn muốn xóa bài viết này?</p>
-                            <button
-                              className='save-update'
-                              onClick={handleDeletePost}
-                            >
-                              Xác nhận
-                            </button>
-                            <button
-                              className='cancel-update'
-                              onClick={closeDeleteModal}
-                            >
-                              Hủy
-                            </button>
-                          </div>
-                        )}
+
                         <div
                           className='description'
                           style={{ marginLeft: "15px" }}
@@ -311,6 +316,8 @@ export default function Page() {
                             width={200}
                             src={post.images}
                             alt=''
+                            quality={100}
+                            priority
                           ></Image>
                         </div>
                         <div className='we-video-info'>
@@ -350,28 +357,55 @@ export default function Page() {
                       </div>
                     </div>
                     <div className='like-comment-share'>
-                          <span
-                            className='like'
-                            title='dislike'
-                          >
-                            <i className='fas fa-heart'></i>
-                            Like
-                          </span>
-                          <span
-                            className='like'
-                            title='dislike'
-                          >
-                            <i className='far fa-comment'></i>
-                            Comments
-                          </span>
-                          <span
-                            className='like'
-                            title='dislike'
-                          >
-                            <i className='fas fa-share-alt'></i>
-                            Share
-                          </span>
+                      <span
+                        className='like'
+                        title='dislike'
+                      >
+                        <i className='fas fa-heart'></i>
+                        Like
+                      </span>
+                      <span
+                        className='like'
+                        title='dislike'
+                      >
+                        <i className='far fa-comment'></i>
+                        Comments
+                      </span>
+                      <span
+                        className='like'
+                        title='dislike'
+                      >
+                        <i className='fas fa-share-alt'></i>
+                        Share
+                      </span>
                     </div>
+
+                    {/* Modal xóa bài viết */}
+                    {isDeleteModalOpen && (
+                      <div
+                        className='confirmation-overlay'
+                        style={{
+                          backgroundColor: "rgba(0, 0, 0, 0.3)",
+                          display: "block !important",
+                        }}
+                      >
+                        <div className='confirmation-modal'>
+                          <p>Bạn có chắc chắn muốn xóa bài viết này?</p>
+                          <button
+                            className='save-update'
+                            onClick={handleDeletePost}
+                          >
+                            Xác nhận
+                          </button>
+                          <button
+                            className='cancel-update'
+                            onClick={closeDeleteModal}
+                          >
+                            Hủy
+                          </button>
+                        </div>
+                      </div>
+                    )}
                     {/* comment */}
                     {post?.comments && (
                       <CommentComponent

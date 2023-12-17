@@ -121,13 +121,15 @@ export const CommentComponent: React.FC<ICommentProps> = ({
                   width={200}
                   src={comment.avatarPath || ""}
                   alt='Retail Admin'
+                  quality={100}
+                  priority
                 />
               </div>
               <div className='we-comment'>
                 <div className='coment-head'>
                   <h5>
                     <a
-                      href='time-line.html'
+                      href='#'
                       title=''
                     >
                       {comment.name}
@@ -141,31 +143,34 @@ export const CommentComponent: React.FC<ICommentProps> = ({
                   >
                     <i className='fa fa-reply'></i>
                   </a>
-                  <div
-                    className='dropdown'
-                    style={{ float: "right", marginRight: "30px" }}
-                  >
-                    <a id='dropdownToggle'>
-                      <i className='fas fa-ellipsis-h'></i>
-                    </a>
+                  {comment.creatorId === userId && (
                     <div
-                      className='dropdown-content'
-                      id='myDropdown'
+                      className='dropdown'
+                      style={{ float: "right", marginRight: "30px" }}
                     >
-                      <ul className='ul'>
-                        <li>
-                          <a onClick={() => handleCommentEditClick(comment)}>
-                            <i className='fas fa-pencil-alt'> Chỉnh sửa</i>
-                          </a>
-                        </li>
-                        <li>
-                          <a onClick={() => handleCommentDeleteClick(comment)}>
-                            <i className='fas fa-trash-alt'> Xóa</i>
-                          </a>
-                        </li>
-                      </ul>
+                      <a id='dropdownToggle'>
+                        <i className='fas fa-ellipsis-h'></i>
+                      </a>
+
+                      <div
+                        className='dropdown-content'
+                        id='myDropdown'
+                      >
+                        <ul className='ul'>
+                          <li>
+                            <a onClick={() => handleCommentEditClick(comment)}>
+                              <i className='fas fa-pencil-alt'> Chỉnh sửa</i>
+                            </a>
+                          </li>
+                          <li>
+                            <a onClick={() => handleCommentDeleteClick(comment)}>
+                              <i className='fas fa-trash-alt'> Xóa</i>
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
                 {!isCommentEditModalOpen && <p>{comment.comment}</p>}
 

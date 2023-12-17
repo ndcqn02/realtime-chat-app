@@ -93,13 +93,14 @@ export default function Page() {
         />
         <div className='page-title'>
           <div className='row'>
+            <img src="./image/logo_chat.jpg" alt="" />
             <h4>Chat Web App</h4>
             <UserButton afterSignOutUrl='/' />
           </div>
         </div>
         <div className='top-bar'>
           <div className='navbar'>
-            <a href='home'>
+          <a href='home' style={{ color: '#00fe2a'}}>
               <i className='fas fa-home'></i>
             </a>
             <a href='message'>
@@ -185,14 +186,14 @@ export default function Page() {
               currentUserId={user?.id}
             />
 
-            <div className='loadMore'>
+            <div className='loadMore' >
               {listPost?.map((post) => {
                 return (
                   <div
                     key={post._id}
                     className='central-meta item'
                   >
-                    <div className='user-post'>
+                    <div className='user-post'  style={{paddingTop:"10px"}}>
                       <div className='friend-info'>
                         <Image
                           style={{ marginLeft: "15px" }}
@@ -245,7 +246,7 @@ export default function Page() {
                               placeholder='Nhập mô tả bài viết...'
                             ></textarea>
                             <div className='post-meta'>
-                              <Image
+                              <Image 
                                 height={500}
                                 width={500}
                                 className='m-r-20'
@@ -349,8 +350,6 @@ export default function Page() {
                       </div>
                     </div>
                     <div className='like-comment-share'>
-                      <ul>
-                        <li>
                           <span
                             className='like'
                             title='dislike'
@@ -358,8 +357,6 @@ export default function Page() {
                             <i className='fas fa-heart'></i>
                             Like
                           </span>
-                        </li>
-                        <li>
                           <span
                             className='like'
                             title='dislike'
@@ -367,8 +364,6 @@ export default function Page() {
                             <i className='far fa-comment'></i>
                             Comments
                           </span>
-                        </li>
-                        <li>
                           <span
                             className='like'
                             title='dislike'
@@ -376,8 +371,6 @@ export default function Page() {
                             <i className='fas fa-share-alt'></i>
                             Share
                           </span>
-                        </li>
-                      </ul>
                     </div>
                     {/* comment */}
                     {post?.comments && (

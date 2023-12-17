@@ -145,7 +145,7 @@ export default function Page() {
             <a href='home'>
               <i className='fas fa-home'></i>
             </a>
-            <a href='message'>
+            <a href='message' style={{ color: '#00fe2a'}}>
               <i className='far fa-comment-dots'></i>
             </a>
             <a href='#'>

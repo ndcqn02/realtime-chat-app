@@ -151,7 +151,7 @@ export const CommentComponent: React.FC<ICommentProps> = ({
                   </div>
                 </div>
                 </div>
-                <p>{comment.comment}</p>
+                <p style={{maxWidth:'500px'}}>{comment.comment}</p>
                 {/* Modal xác nhận xóa bình luận */}
                 {selectedComment && (
                   <div className="delete-comment-modal">

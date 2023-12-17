@@ -9,6 +9,7 @@ import io, { Socket } from "socket.io-client";
 import { IChat, hostSocket } from "@/constant";
 import { Conversation } from "@/components/conversation";
 import { UserButton } from "@clerk/nextjs";
+import { formatDateTime } from "@/utils/utils";
 
 export interface IFriendChat {
   _id: string;
@@ -250,7 +251,7 @@ export default function Page() {
                     <div className='group-name-time'>
                       <div className='name-time'>
                         <p className='name'>{item.name}</p>
-                        <p className='time'>{item.createdAt}</p>
+                        <p className='time'>{formatDateTime(item.createdAt || '')}</p>
                       </div>
                       <p className='content'>{item.lastedMessage}</p>
                     </div>

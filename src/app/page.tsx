@@ -1,10 +1,11 @@
 import Image from "next/image";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, currentUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs";
 
-export default function Home2222() {
+export default  async function Home2222() {
   const { userId }: { userId: string | null } = auth();
+  const user = await currentUser();
   if (userId) {
     redirect("/home");
   } else {

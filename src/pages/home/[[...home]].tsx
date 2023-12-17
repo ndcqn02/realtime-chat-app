@@ -2,23 +2,39 @@ import "@clerk/nextjs";
 import "@/styles/Message.css";
 import "@/styles/Home.css";
 import "next/app";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, currentUser, useUser } from "@clerk/nextjs";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { IPostRes, getAllPost } from "@/api/post";
+import CreatePostForm from "@/components/createPostForm";
+import { CommentComponent } from "@/components/comment";
+import { ToastContainer } from "react-toastify";
+import { formatDateTime } from "@/utils/utils";
 
 export default function Page() {
   const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [listPost, setListPost] = useState<IPostRes[]>();
+  const { user, isLoaded } = useUser();
   const [description, setDescription] = useState(
     "World's most beautiful car in Curabitur #test drive booking !",
   );
   const [imageUrl, setImageUrl] = useState(
     "https://cdn.sforum.vn/sforum/wp-content/uploads/2023/06/tai-hinh-nen-dep-nhat-the-gioi-57.jpg",
   );
-  setEditModalOpen
+  setEditModalOpen;
   const handleEditClick = () => {
     setEditModalOpen(true);
   };
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const { data, isLoading, isError } = useQuery({ queryKey: ["POSTS"], queryFn: getAllPost });
+
+  useEffect(() => {
+    if (!isLoading && !isError) {
+      setListPost(data);
+    }
+  }, [isLoading, isError, data]);
+
   const handleSaveClick = () => {
     // Xử lý lưu thay đổi ở đây
     // Sau khi lưu, đóng modal
@@ -50,6 +66,10 @@ export default function Page() {
     // Sau khi xóa, đóng modal
     closeDeleteModal();
   };
+
+  if (!isLoaded) {
+    return null;
+  }
   return (
     <div className='layout'>
       <div className='fixed-top'>
@@ -146,715 +166,230 @@ export default function Page() {
         </div>
         <div className='layout-center-home'>
           <div className='col-lg-6'>
-            <div className='central-meta'>
-              <div className='new-postbox'>
-                <Image
-                  height={200}
-                  width={200}
-                  src='https://www.bootdey.com/img/Content/avatar/avatar5.png'
-                  alt='Retail Admin'
-                />
-                <div className='newpst-input'>
-                  <form method='post'>
-                    <textarea placeholder='Bạn đang nghĩ gì?'></textarea>
-                    <div className='attachments'>
-                      <ul>
-                        <li>
-                          <i className='fa fa-music'></i>
-                          <label className='fileContainer'>
-                            <input type='file'></input>
-                          </label>
-                        </li>
-                        <li>
-                          <i className='fa fa-image'></i>
-                          <label className='fileContainer'>
-                            <input type='file'></input>
-                          </label>
-                        </li>
-                        <li>
-                          <i className='fa fa-video-camera'></i>
-                          <label className='fileContainer'>
-                            <input type='file'></input>
-                          </label>
-                        </li>
-                        <li>
-                          <i className='fa fa-camera'></i>
-                          <label className='fileContainer'>
-                            <input type='file'></input>
-                          </label>
-                        </li>
-                        <li>
-                          <button type='submit'>Đăng</button>
-                        </li>
-                      </ul>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
+            <CreatePostForm
+              imageUrl={user?.imageUrl}
+              currentUserId={user?.id}
+            />
+
             <div className='loadMore'>
-              <div className='central-meta item'>
-                <div className='user-post'>
-                  <div className='friend-info'>
-                    <Image
-                      height={200}
-                      width={200}
-                      src='https://www.bootdey.com/img/Content/avatar/avatar5.png'
-                      alt='Retail Admin'
-                    />
+              {listPost?.map((post) => {
+                return (
+                  <div
+                    key={post._id}
+                    className='central-meta item'
+                  >
+                    <div className='user-post'>
+                      <div className='friend-info'>
+                        <Image 
+                          style={{marginLeft:"15px"}}
+                          height={200}
+                          width={200}
+                          src={post.avatarPath || ""}
+                          alt='Retail Admin'
+                        />
 
-                    <div className='friend-name'>
-                      <ins>
-                        <a
-                          href='time-line.html'
-                          title=''
-                        >
-                          Janice Griffith
-                        </a>
-                      </ins>
-                      <span>published: june,2 2018 19:PM</span>
-                    </div>
-                    <div className='dropdown'>
-                      <a id='dropdownToggle'>
-                        <i className='fas fa-ellipsis-h'></i>
-                      </a>
-                      <div
-                        className='dropdown-content'
-                        id='myDropdown'
-                      >
-                        <ul className="ul">
-                          <li>
-                            <a onClick={handleEditClick} ><i className="fas fa-pencil-alt">  Chỉnh sửa</i></a>
-                          </li>
-                          <li>
-                            <a onClick={openDeleteModal} ><i className="fas fa-trash-alt">  Xóa</i></a>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                    {/* Modal chỉnh sửa */}
-                    {isEditModalOpen && (
-                      <div className='edit-modal'>
-                        <h2>Chỉnh sửa bài viết</h2>
-                        <textarea
-                          value={description}
-                          onChange={(e) => setDescription(e.target.value)}
-                          placeholder='Nhập mô tả bài viết...'
-                        ></textarea>
-                        <div className='post-meta'>
-                          <img className="m-r-20"
-                            src={imageUrl}
-                            alt='Bài viết'
-                          />
-                          <i
-                            className=' delete_img far fa-times-circle'
-                            onClick={() => setImageUrl("")}
-                          ></i>
-                          <div className='image-controls'>
-                            <label htmlFor='imageInput'>Chọn ảnh mới</label>
-                            <br />
-                            <input
-                              id='imageInput'
-                              type='file'
-                              onChange={handleImageChange}
-                            />
+                        <div className='friend-name'>
+                          <ins>
+                            <a
+                              href='time-line.html'
+                              title=''
+                            >
+                              {post.name}
+                            </a>
+                          </ins>
+                          <span>{formatDateTime(post.createdAt || '')}</span>
+                        </div>
+                        <div className='dropdown'>
+                          <a id='dropdownToggle'>
+                            <i className='fas fa-ellipsis-h'></i>
+                          </a>
+                          <div
+                            className='dropdown-content'
+                            id='myDropdown'
+                          >
+                            <ul className='ul'>
+                              <li>
+                                <a onClick={handleEditClick}>
+                                  <i className='fas fa-pencil-alt'> Chỉnh sửa</i>
+                                </a>
+                              </li>
+                              <li>
+                                <a onClick={openDeleteModal}>
+                                  <i className='fas fa-trash-alt'> Xóa</i>
+                                </a>
+                              </li>
+                            </ul>
                           </div>
                         </div>
-                        <button
-                          className='save-update'
-                          onClick={handleSaveClick}
-                        >
-                          Lưu
-                        </button>
-                        <button
-                          className='cancel-update'
-                          onClick={handleCancelClick}
-                        >
-                          Hủy
-                        </button>
+                        {/* Modal chỉnh sửa */}
+                        {isEditModalOpen && (
+                          <div className='edit-modal'>
+                            <h2>Chỉnh sửa bài viết</h2>
+                            <textarea
+                              value={description}
+                              onChange={(e) => setDescription(e.target.value)}
+                              placeholder='Nhập mô tả bài viết...'
+                            ></textarea>
+                            <div className='post-meta'>
+                              <Image
+                                height={500}
+                                width={500}
+                                className='m-r-20'
+                                src={imageUrl}
+                                alt='Bài viết'
+                              />
+                              <i
+                                className=' delete_img far fa-times-circle'
+                                onClick={() => setImageUrl("")}
+                              ></i>
+                              <div className='image-controls'>
+                                <label htmlFor='imageInput'>Chọn ảnh mới</label>
+                                <br />
+                                <input
+                                  id='imageInput'
+                                  type='file'
+                                  onChange={handleImageChange}
+                                />
+                              </div>
+                            </div>
+                            <button
+                              className='save-update'
+                              onClick={handleSaveClick}
+                            >
+                              Lưu
+                            </button>
+                            <button
+                              className='cancel-update'
+                              onClick={handleCancelClick}
+                            >
+                              Hủy
+                            </button>
+                          </div>
+                        )}
+                        {/* Modal xóa bài viết */}
+                        {isDeleteModalOpen && (
+                          <div className='delete-modal'>
+                            <p>Bạn có chắc chắn muốn xóa bài viết này?</p>
+                            <button
+                              className='save-update'
+                              onClick={handleDeletePost}
+                            >
+                              Xác nhận
+                            </button>
+                            <button
+                              className='cancel-update'
+                              onClick={closeDeleteModal}
+                            >
+                              Hủy
+                            </button>
+                          </div>
+                        )}
+                        <div className='description' style={{marginLeft:"15px"}}>
+                          <p>{post.content}</p>
+                        </div>
+                        <div className='post-meta'>
+                          <Image
+                            height={200}
+                            width={200}
+                            src={post.images}
+                            alt=''
+                          ></Image>
+                        </div>
+                        <div className='we-video-info'>
+                          <ul>
+                            <li>
+                              <span
+                                data-toggle='tooltip'
+                                title='like'
+                              >
+                                <i className='fas fa-heart'></i>
+                                <ins>{post.numberLike}</ins>
+                              </span>
+                            </li>
+
+                            <li>
+                              <span
+                                className='comment'
+                                data-toggle='tooltip'
+                                title='Comments'
+                              >
+                                <i className='far fa-comment'></i>
+                                <ins>{post.numberComment}</ins>
+                              </span>
+                            </li>
+
+                            <li>
+                              <span
+                                className='dislike'
+                                data-toggle='tooltip'
+                                title='dislike'
+                              >
+                                <i className='fas fa-share-alt'></i>
+                              </span>
+                            </li>
+                          </ul>
+                        </div>
                       </div>
-                    )}
-                    {/* Modal xóa bài viết */}
-                    {isDeleteModalOpen && (
-                      <div className='delete-modal'>
-                        <p>Bạn có chắc chắn muốn xóa bài viết này?</p>
-                        <button className='save-update' onClick={handleDeletePost}>Xác nhận</button>
-                        <button className='cancel-update' onClick={closeDeleteModal}>Hủy</button>
-                      </div>
-                    )}
-                    <div className='description'>
-                      <p>
-                        World s most beautiful car in Curabitur{" "}
-                        <a
-                          href='#'
-                          title=''
-                        >
-                          #test drive booking !
-                        </a>{" "}
-                        the most beatuiful car available in america and the saudia arabia, you can
-                        book your test drive by our official website
-                      </p>
                     </div>
-                    <div className='post-meta'>
-                      <Image
-                        height={200}
-                        width={200}
-                        src='https://cdn.sforum.vn/sforum/wp-content/uploads/2023/06/tai-hinh-nen-dep-nhat-the-gioi-57.jpg'
-                        alt=''
-                      ></Image>
-                    </div>
-                    <div className='we-video-info'>
+                    <div className='like-comment-share'>
                       <ul>
                         <li>
                           <span
-                            data-toggle='tooltip'
-                            title='like'
+                            className='like'
+                            title='dislike'
                           >
                             <i className='fas fa-heart'></i>
-                            <ins>200</ins>
+                            Like
                           </span>
                         </li>
-
                         <li>
                           <span
-                            className='comment'
-                            data-toggle='tooltip'
-                            title='Comments'
+                            className='like'
+                            title='dislike'
                           >
                             <i className='far fa-comment'></i>
-                            <ins>52</ins>
+                            Comments
                           </span>
                         </li>
-
                         <li>
                           <span
-                            className='dislike'
-                            data-toggle='tooltip'
+                            className='like'
                             title='dislike'
                           >
                             <i className='fas fa-share-alt'></i>
-                            <ins>200</ins>
+                            Share
                           </span>
                         </li>
                       </ul>
                     </div>
-                  </div>
-                </div>
-                <div className='like-comment-share'>
-                  <ul>
-                    <li>
-                      <span
-                        className='like'
-                        title='dislike'
-                      >
-                        <i className='fas fa-heart'></i>
-                        Like
-                      </span>
-                    </li>
-                    <li>
-                      <span
-                        className='like'
-                        title='dislike'
-                      >
-                        <i className='far fa-comment'></i>
-                        Comments
-                      </span>
-                    </li>
-                    <li>
-                      <span
-                        className='like'
-                        title='dislike'
-                      >
-                        <i className='fas fa-share-alt'></i>
-                        Share
-                      </span>
-                    </li>
-                  </ul>
-                </div>
-                <div className='coment-area'>
-                  <ul className='we-comet'>
-                    <li>
-                      <div className='comet-avatar'>
-                        <Image
-                          height={200}
-                          width={200}
-                          src='https://www.bootdey.com/img/Content/avatar/avatar2.png'
-                          alt='Retail Admin'
-                        />
-                      </div>
-                      <div className='we-comment'>
-                        <div className='coment-head'>
-                          <h5>
-                            <a
-                              href='time-line.html'
-                              title=''
-                            >
-                              Jason borne
-                            </a>
-                          </h5>
-                          <span>1 year ago</span>
-                          <a
-                            className='we-reply'
-                            href='#'
-                            title='Reply'
-                          >
-                            <i className='fa fa-reply'></i>
-                          </a>
-                        </div>
-                        <p>
-                          we are working for the dance and sing songs. this car is very awesome for
-                          the youngster. please vote this car and like our post
-                        </p>
-                      </div>
-                    </li>
-                    <li>
-                      <div className='comet-avatar'>
-                        <Image
-                          height={200}
-                          width={200}
-                          src='https://www.bootdey.com/img/Content/avatar/avatar2.png'
-                          alt='Retail Admin'
-                        />
-                      </div>
-                      <div className='we-comment'>
-                        <div className='coment-head'>
-                          <h5>
-                            <a
-                              href='time-line.html'
-                              title=''
-                            >
-                              Jason borne
-                            </a>
-                          </h5>
-                          <span>1 year ago</span>
-                          <a
-                            className='we-reply'
-                            href='#'
-                            title='Reply'
-                          >
-                            <i className='fa fa-reply'></i>
-                          </a>
-                        </div>
-                        <p>
-                          we are working for the dance and sing songs. this car is very awesome for
-                          the youngster. please vote this car and like our post
-                        </p>
-                      </div>
-                    </li>
-                    <li>
-                      <div className='comet-avatar'>
-                        <Image
-                          height={200}
-                          width={200}
-                          src='https://www.bootdey.com/img/Content/avatar/avatar4.png'
-                          alt='Retail Admin'
-                        />
-                      </div>
-                      <div className='we-comment'>
-                        <div className='coment-head'>
-                          <h5>
-                            <a
-                              href='time-line.html'
-                              title=''
-                            >
-                              alexendra dadrio
-                            </a>
-                          </h5>
-                          <span>1 month ago</span>
-                          <a
-                            className='we-reply'
-                            href='#'
-                            title='Reply'
-                          >
-                            <i className='fa fa-reply'></i>
-                          </a>
-                        </div>
-                        <p>
-                          yes, really very awesome car i see the features of this car in the
-                          official website of{" "}
-                          <a
-                            href='#'
-                            title=''
-                          >
-                            #Mercedes-Benz
-                          </a>{" "}
-                          and really impressed
-                        </p>
-                      </div>
-                    </li>
-                    <li>
-                      <a
-                        href='#'
-                        title=''
-                        className='showmore underline'
-                      >
-                        more comments
-                      </a>
-                    </li>
-                    <li className='post-comment'>
-                      <div className='comet-avatar'>
-                        <Image
-                          height={200}
-                          width={200}
-                          src='https://www.bootdey.com/img/Content/avatar/avatar3.png'
-                          alt='Retail Admin'
-                        />
-                      </div>
-                      <div className='post-comt-box'>
-                        <form
-                          method='post'
-                          className='comment'
-                        >
-                          <textarea
-                            className='import'
-                            placeholder='Viết bình luận...'
-                          ></textarea>
-                          <button type='submit'>
-                            <i
-                              className='fas fa-paper-plane'
-                              style={{ color: "#9ec94a" }}
-                            ></i>
-                          </button>
-                        </form>
-                      </div>
-                    </li>
-                  </ul>
-
-                </div>
-              </div>
-              <div className='central-meta item'>
-                <div className='user-post'>
-                  <div className='friend-info'>
-                    <Image
-                      height={200}
-                      width={200}
-                      src='https://www.bootdey.com/img/Content/avatar/avatar5.png'
-                      alt='Retail Admin'
-                    />
-
-                    <div className='friend-name'>
-                      <ins>
-                        <a
-                          href='time-line.html'
-                          title=''
-                        >
-                          Janice Griffith
-                        </a>
-                      </ins>
-                      <span>published: june,2 2018 19:PM</span>
-                    </div>
-                    <div className='dropdown'>
-                      <a id='dropdownToggle'>
-                        <i className='fas fa-ellipsis-h'></i>
-                      </a>
-                      <div
-                        className='dropdown-content'
-                        id='myDropdown'
-                      >
-                        <ul className="ul">
-                          <li>
-                            <a onClick={handleEditClick} ><i className="fas fa-pencil-alt">  Chỉnh sửa</i></a>
-                          </li>
-                          <li>
-                            <a onClick={openDeleteModal} ><i className="fas fa-trash-alt">  Xóa</i></a>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                    {/* Modal chỉnh sửa */}
-                    {isEditModalOpen && (
-                      <div className='edit-modal'>
-                        <h2>Chỉnh sửa bài viết</h2>
-                        <textarea
-                          value={description}
-                          onChange={(e) => setDescription(e.target.value)}
-                          placeholder='Nhập mô tả bài viết...'
-                        ></textarea>
-                        <div className='post-meta'>
-                          <img className="m-r-20"
-                            src={imageUrl}
-                            alt='Bài viết'
-                          />
-                          <i
-                            className=' delete_img far fa-times-circle'
-                            onClick={() => setImageUrl("")}
-                          ></i>
-                          <div className='image-controls'>
-                            <label htmlFor='imageInput'>Chọn ảnh mới</label>
-                            <br />
-                            <input
-                              id='imageInput'
-                              type='file'
-                              onChange={handleImageChange}
-                            />
-                          </div>
-                        </div>
-                        <button
-                          className='save-update'
-                          onClick={handleSaveClick}
-                        >
-                          Lưu
-                        </button>
-                        <button
-                          className='cancel-update'
-                          onClick={handleCancelClick}
-                        >
-                          Hủy
-                        </button>
-                      </div>
+                    {/* comment */}
+                    {post?.comments && (
+                      <CommentComponent
+                        listComment={post.comments}
+                        userCurrentImg={user?.imageUrl}
+                        userId={user?.id}
+                        postId={post._id}
+                      />
                     )}
-                    {/* Modal xóa bài viết */}
-                    {isDeleteModalOpen && (
-                      <div className='delete-modal'>
-                        <p>Bạn có chắc chắn muốn xóa bài viết này?</p>
-                        <button className='save-update' onClick={handleDeletePost}>Xác nhận</button>
-                        <button className='cancel-update' onClick={closeDeleteModal}>Hủy</button>
-                      </div>
-                    )}
-                    <div className='description'>
-                      <p>
-                        World s most beautiful car in Curabitur{" "}
-                        <a
-                          href='#'
-                          title=''
-                        >
-                          #test drive booking !
-                        </a>{" "}
-                        the most beatuiful car available in america and the saudia arabia, you can
-                        book your test drive by our official website
-                      </p>
-                    </div>
-                    <div className='post-meta'>
-                      <Image
-                        height={200}
-                        width={200}
-                        src='https://cdn.sforum.vn/sforum/wp-content/uploads/2023/06/tai-hinh-nen-dep-nhat-the-gioi-57.jpg'
-                        alt=''
-                      ></Image>
-                    </div>
-                    <div className='we-video-info'>
-                      <ul>
-                        <li>
-                          <span
-                            data-toggle='tooltip'
-                            title='like'
-                          >
-                            <i className='fas fa-heart'></i>
-                            <ins>200</ins>
-                          </span>
-                        </li>
-
-                        <li>
-                          <span
-                            className='comment'
-                            data-toggle='tooltip'
-                            title='Comments'
-                          >
-                            <i className='far fa-comment'></i>
-                            <ins>52</ins>
-                          </span>
-                        </li>
-
-                        <li>
-                          <span
-                            className='dislike'
-                            data-toggle='tooltip'
-                            title='dislike'
-                          >
-                            <i className='fas fa-share-alt'></i>
-                            <ins>200</ins>
-                          </span>
-                        </li>
-                      </ul>
-                    </div>
                   </div>
-                </div>
-                <div className='like-comment-share'>
-                  <ul>
-                    <li>
-                      <span
-                        className='like'
-                        title='dislike'
-                      >
-                        <i className='fas fa-heart'></i>
-                        Like
-                      </span>
-                    </li>
-                    <li>
-                      <span
-                        className='like'
-                        title='dislike'
-                      >
-                        <i className='far fa-comment'></i>
-                        Comments
-                      </span>
-                    </li>
-                    <li>
-                      <span
-                        className='like'
-                        title='dislike'
-                      >
-                        <i className='fas fa-share-alt'></i>
-                        Share
-                      </span>
-                    </li>
-                  </ul>
-                </div>
-                <div className='coment-area'>
-                  <ul className='we-comet'>
-                    <li>
-                      <div className='comet-avatar'>
-                        <Image
-                          height={200}
-                          width={200}
-                          src='https://www.bootdey.com/img/Content/avatar/avatar2.png'
-                          alt='Retail Admin'
-                        />
-                      </div>
-                      <div className='we-comment'>
-                        <div className='coment-head'>
-                          <h5>
-                            <a
-                              href='time-line.html'
-                              title=''
-                            >
-                              Jason borne
-                            </a>
-                          </h5>
-                          <span>1 year ago</span>
-                          <a
-                            className='we-reply'
-                            href='#'
-                            title='Reply'
-                          >
-                            <i className='fa fa-reply'></i>
-                          </a>
-                        </div>
-                        <p>
-                          we are working for the dance and sing songs. this car is very awesome for
-                          the youngster. please vote this car and like our post
-                        </p>
-                      </div>
-                    </li>
-                    <li>
-                      <div className='comet-avatar'>
-                        <Image
-                          height={200}
-                          width={200}
-                          src='https://www.bootdey.com/img/Content/avatar/avatar2.png'
-                          alt='Retail Admin'
-                        />
-                      </div>
-                      <div className='we-comment'>
-                        <div className='coment-head'>
-                          <h5>
-                            <a
-                              href='time-line.html'
-                              title=''
-                            >
-                              Jason borne
-                            </a>
-                          </h5>
-                          <span>1 year ago</span>
-                          <a
-                            className='we-reply'
-                            href='#'
-                            title='Reply'
-                          >
-                            <i className='fa fa-reply'></i>
-                          </a>
-                        </div>
-                        <p>
-                          we are working for the dance and sing songs. this car is very awesome for
-                          the youngster. please vote this car and like our post
-                        </p>
-                      </div>
-                    </li>
-                    <li>
-                      <div className='comet-avatar'>
-                        <Image
-                          height={200}
-                          width={200}
-                          src='https://www.bootdey.com/img/Content/avatar/avatar4.png'
-                          alt='Retail Admin'
-                        />
-                      </div>
-                      <div className='we-comment'>
-                        <div className='coment-head'>
-                          <h5>
-                            <a
-                              href='time-line.html'
-                              title=''
-                            >
-                              alexendra dadrio
-                            </a>
-                          </h5>
-                          <span>1 month ago</span>
-                          <a
-                            className='we-reply'
-                            href='#'
-                            title='Reply'
-                          >
-                            <i className='fa fa-reply'></i>
-                          </a>
-                        </div>
-                        <p>
-                          yes, really very awesome car i see the features of this car in the
-                          official website of{" "}
-                          <a
-                            href='#'
-                            title=''
-                          >
-                            #Mercedes-Benz
-                          </a>{" "}
-                          and really impressed
-                        </p>
-                      </div>
-                    </li>
-                    <li>
-                      <a
-                        href='#'
-                        title=''
-                        className='showmore underline'
-                      >
-                        more comments
-                      </a>
-                    </li>
-                    <li className='post-comment'>
-                      <div className='comet-avatar'>
-                        <Image
-                          height={200}
-                          width={200}
-                          src='https://www.bootdey.com/img/Content/avatar/avatar3.png'
-                          alt='Retail Admin'
-                        />
-                      </div>
-                      <div className='post-comt-box'>
-                        <form
-                          method='post'
-                          className='comment'
-                        >
-                          <textarea
-                            className='import'
-                            placeholder='Viết bình luận...'
-                          ></textarea>
-                          <button type='submit'>
-                            <i
-                              className='fas fa-paper-plane'
-                              style={{ color: "#9ec94a" }}
-                            ></i>
-                          </button>
-                        </form>
-                      </div>
-                    </li>
-                  </ul>
-
-                </div>
-              </div>
+                );
+              })}
             </div>
           </div>
         </div>
       </div>
+      <ToastContainer
+        position='top-right'
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme='light'
+      />
     </div>
   );
 }
